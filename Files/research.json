@@ -1,0 +1,58 @@
+{
+    "savunma_ustaligi": {
+        "seviye_1": {
+            "deger": "10",
+            "aciklama": "Tüm birimlerin savunmasını %10 artırır."
+        },
+        "seviye_2": {
+            "deger": "20",
+            "aciklama": "Tüm birimlerin savunmasını %20 artırır."
+        },
+        "seviye_3": {
+            "deger": "30",
+            "aciklama": "Tüm birimlerin savunmasını %30 artırır."
+        }
+    },
+    "saldiri_gelistirmesi": {
+        "seviye_1": {
+            "deger": "10",
+            "aciklama": "Tüm birimlerin saldırı gücünü %10 artırır."
+        },
+        "seviye_2": {
+            "deger": "20",
+            "aciklama": "Tüm birimlerin saldırı gücünü %20 artırır."
+        },
+        "seviye_3": {
+            "deger": "30",
+            "aciklama": "Tüm birimlerin saldırı gücünü %30 artırır."
+        }
+    },
+    "elit_egitim": {
+        "seviye_1": {
+            "deger": "5",
+            "aciklama": "Tüm birimlere %5 kritik vuruş şansı sağlar."
+        },
+        "seviye_2": {
+            "deger": "10",
+            "aciklama": "Tüm birimlere %10 kritik vuruş şansı sağlar."
+        },
+        "seviye_3": {
+            "deger": "15",
+            "aciklama": "Tüm birimlere %15 kritik şansla kullanıma açar."
+        }
+    },
+    "kusatma_ustaligi": {
+        "seviye_1": {
+            "deger": "10",
+            "aciklama": "Kuşatma makinelerinin saldırı gücünü %10 artırır."
+        },
+        "seviye_2": {
+            "deger": "20",
+            "aciklama": "Kuşatma makinelerinin saldırı gücünü %20 artırır."
+        },
+        "seviye_3": {
+            "deger": "30",
+            "aciklama": "Kuşatma makinelerinin saldırı gücünü %30 artırır."
+        }
+    }
+}

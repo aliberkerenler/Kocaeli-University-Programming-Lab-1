@@ -1,0 +1,54 @@
+{
+    "insan_imparatorlugu": {
+        "Alparslan": {
+            "bonus_turu": "savunma",
+            "etkiledigi_birim": "piyadeler",
+            "bonus_degeri": "20",
+            "aciklama": "Piyadelere %20 savunma bonusu sağlar."
+        },
+        "Fatih_Sultan_Mehmet": {
+            "bonus_turu": "saldiri",
+            "etkiledigi_birim": "kusatma_makineleri",
+            "bonus_degeri": "25",
+            "aciklama": "Kuşatma makinelerinin saldırı gücünü %25 artırır."
+        },
+        "Yavuz_Sultan_Selim": {
+            "bonus_turu": "kritik",
+            "etkiledigi_birim": "suvariler",
+            "bonus_degeri": "15",
+            "aciklama": "Süvarilere %15 kritik vuruş şansı sağlar."
+        },
+        "Tugrul_Bey": {
+            "bonus_turu": "saldiri",
+            "etkiledigi_birim": "okcular",
+            "bonus_degeri": "20",
+            "aciklama": "Okçuların saldırı gücünü %20 artırır."
+        }
+    },
+    "ork_legi": {
+        "Goruk_Vahsi": {
+            "bonus_turu": "saldiri",
+            "etkiledigi_birim": "ork_dovusculeri",
+            "bonus_degeri": "20",
+            "aciklama": "Ork dövüşçülerine %20 saldırı bonusu sağlar."
+        },
+        "Thruk_Kemikkiran": {
+            "bonus_turu": "savunma",
+            "etkiledigi_birim": "troller",
+            "bonus_degeri": "25",
+            "aciklama": "Trollerin savunma gücünü %25 artırır."
+        },
+        "Vrog_Kafakiran": {
+            "bonus_turu": "kritik",
+            "etkiledigi_birim": "varg_binicileri",
+            "bonus_degeri": "15",
+            "aciklama": "Varg binicilerine %15 kritik vuruş şansı sağlar."
+        },
+        "Ugar_Zalim": {
+            "bonus_turu": "direnc",
+            "etkiledigi_birim": "tum_birimler",
+            "bonus_degeri": "10",
+            "aciklama": "Tüm birimlere karşı %10 direnç sağlar."
+        }
+    }
+}
