@@ -1,0 +1,119 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int saldiri;
+    int savunma;
+    int saglik;
+    int kritik_sans;  // Kritik şans yüzdesi (%), her X vuruşta 1 kritik
+    int birim_sayisi;
+    int vurus_sayisi;  // Vuruş sayısını takip eden değişken
+} Birim;
+
+// Kritik vuruş kontrolü (Belirli adımlarda kritik vuruş yapar)
+int kritik_vurus_kontrol(Birim *saldiran) {
+    // Her X vuruşta 1 kritik vurulacak (örneğin, %10 şans için her 10 adımda)
+    int vurus_periyodu = 100 / saldiran->kritik_sans;
+    if (saldiran->vurus_sayisi % vurus_periyodu == 0 && saldiran->vurus_sayisi != 0) {
+        return 1;  // Kritik vuruş
+    }
+    return 0;  // Normal vuruş
+}
+
+// Net hasar hesaplayan fonksiyon (kritik vuruşu dahil)
+double net_hasar_hesapla(Birim *saldiran, Birim savunan) {
+    int toplam_saldiri_gucu = saldiran->saldiri * saldiran->birim_sayisi;
+
+    // Kritik vuruş kontrolü
+    if (kritik_vurus_kontrol(saldiran)) {
+        printf("Kritik vurus! Saldiri gucu 1.5 katina cikti!\n");
+        toplam_saldiri_gucu *= 1.5;  // Kritik vuruş varsa saldırı gücü 1.5 katına çıkar
+    }
+
+    int toplam_savunma_gucu = savunan.savunma * savunan.birim_sayisi;
+
+    double net_hasar = toplam_saldiri_gucu - toplam_savunma_gucu;
+    if (net_hasar < 0) {
+        net_hasar = 0;  // Negatif hasar olmamalı
+    }
+
+    // Saldıran birimin vuruş sayısını artır
+    saldiran->vurus_sayisi++;
+
+    return net_hasar;
+}
+
+// Sağlık kaybını hesaplayan fonksiyon
+double saglik_kaybi_hesapla(Birim *savunan, double net_hasar) {
+    if (net_hasar <= 0) {
+        return savunan->saglik;  // Sağlık değişmez
+    }
+
+    double saglik_kaybi = net_hasar / savunan->birim_sayisi;
+    savunan->saglik -= saglik_kaybi;
+
+    if (savunan->saglik < 0) {
+        savunan->saglik = 0;  // Sağlık 0'ın altına düşmemeli
+    }
+    return savunan->saglik;
+}
+
+// Kazananı bulan ve ekrana yazdıran fonksiyon
+void kazanan_bul(Birim piyadeler, Birim ork_dovusculeri) {
+    if (piyadeler.saglik > 0 && ork_dovusculeri.saglik == 0) {
+        printf("\nSavasin kazanani: Insan irki (Piyadeler)\n");
+    } else if (ork_dovusculeri.saglik > 0 && piyadeler.saglik == 0) {
+        printf("\nSavasin kazanani: Orklar\n");
+    } else if (piyadeler.saglik == 0 && ork_dovusculeri.saglik == 0) {
+        printf("\nSavas berabere bitti!\n");
+    } else {
+        printf("\nSavas devam ediyor!\n");
+    }
+}
+
+// Adım adım savaşı yürüten fonksiyon
+void savas_adim_adim(Birim *piyadeler, Birim *ork_dovusculeri, int adim) {
+    printf("\nAdim %d:\n", adim);
+
+    // İnsanlar (Piyadeler) saldırıyor
+    double ork_net_hasar = net_hasar_hesapla(piyadeler, *ork_dovusculeri);
+    printf("Insan irki (piyadeler) ork dovusculerine %.2f hasar verdi.\n", ork_net_hasar);
+    printf("Ork dovusculerinin yeni sagligi: %.2f\n", saglik_kaybi_hesapla(ork_dovusculeri, ork_net_hasar));
+
+    // Orklar saldırıyor
+    double piyade_net_hasar = net_hasar_hesapla(ork_dovusculeri, *piyadeler);
+    printf("Orklar piyadelere %.2f hasar verdi.\n", piyade_net_hasar);
+    printf("Piyadelerin yeni sagligi: %.2f\n", saglik_kaybi_hesapla(piyadeler, piyade_net_hasar));
+}
+
+int main() {
+    Birim piyadeler = {30, 40, 100, 10, 120, 0};  // %10 kritik şansı
+    Birim ork_dovusculeri = {35, 25, 100, 8, 100, 0};  // %8 kritik şansı
+
+    printf("Piyadeler:\n");
+    printf("Saldiri: %d\n", piyadeler.saldiri);
+    printf("Savunma: %d\n", piyadeler.savunma);
+    printf("Saglik: %d\n", piyadeler.saglik);
+    printf("Kritik Sans: %d\n", piyadeler.kritik_sans);
+    printf("Birim sayisi: %d\n\n", piyadeler.birim_sayisi);
+
+    printf("Orklar:\n");
+    printf("Saldiri: %d\n", ork_dovusculeri.saldiri);
+    printf("Savunma: %d\n", ork_dovusculeri.savunma);
+    printf("Saglik: %d\n", ork_dovusculeri.saglik);
+    printf("Kritik Sans: %d\n", ork_dovusculeri.kritik_sans);
+    printf("Birim sayisi: %d\n\n", ork_dovusculeri.birim_sayisi);
+
+    // Adım adım savaş simülasyonu
+    int adim = 1;
+    while (piyadeler.saglik > 0 && ork_dovusculeri.saglik > 0) {
+        savas_adim_adim(&piyadeler, &ork_dovusculeri, adim);
+        adim++;
+    }
+
+    // Savaşın sonucunu ekrana yazdır
+    kazanan_bul(piyadeler, ork_dovusculeri);
+
+    return 0;
+}
