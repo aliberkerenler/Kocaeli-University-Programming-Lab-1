@@ -1,4 +1,4 @@
-void parse_research_json(const char *filename, Research *R)
+void parse_research_json(const char *filename, Research *HR, Research *OR)
 {
     FILE *file = fopen(filename, "r");
     if (file == NULL)
@@ -8,76 +8,62 @@ void parse_research_json(const char *filename, Research *R)
     }
 
     char line[256];
+    Research_Type *current_research_type = NULL;
+    Seviye *current_level = NULL;
+
     while (fgets(line, sizeof(line), file))
     {
-        if (strstr(line, "\"savunma_ustaligi\"") != NULL)
+        if (strstr(line, "\"savunma_ustaligi\""))
         {
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->savunma_ustaligi.seviye_1.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->savunma_ustaligi.seviye_1.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->savunma_ustaligi.seviye_2.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->savunma_ustaligi.seviye_2.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->savunma_ustaligi.seviye_3.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->savunma_ustaligi.seviye_3.aciklama);
+            current_research_type = &HR->savunma_ustaligi;
         }
-        if (strstr(line, "\"saldiri_gelistirmesi\"") != NULL)
+        else if (strstr(line, "\"saldiri_gelistirmesi\""))
         {
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->saldiri_gelistirmesi.seviye_1.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->saldiri_gelistirmesi.seviye_1.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->saldiri_gelistirmesi.seviye_2.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->saldiri_gelistirmesi.seviye_2.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->saldiri_gelistirmesi.seviye_3.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->saldiri_gelistirmesi.seviye_3.aciklama);
+            current_research_type = &HR->saldiri_gelistirmesi;
         }
-        if (strstr(line, "\"elit_egitim\"") != NULL)
+        else if (strstr(line, "\"elit_egitim\""))
         {
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->elit_egitim.seviye_1.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->elit_egitim.seviye_1.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\": \"%d\",", &R->elit_egitim.seviye_2.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->elit_egitim.seviye_2.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->elit_egitim.seviye_3.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->elit_egitim.seviye_3.aciklama);
+            current_research_type = &HR->elit_egitim;
         }
-        if (strstr(line, "\"kusatma_ustaligi\"") != NULL)
+        else if (strstr(line, "\"kusatma_ustaligi\""))
         {
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->kusatma_ustaligi.seviye_1.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->kusatma_ustaligi.seviye_1.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->kusatma_ustaligi.seviye_2.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->kusatma_ustaligi.seviye_2.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->kusatma_ustaligi.seviye_3.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->kusatma_ustaligi.seviye_3.aciklama);
+            current_research_type = &HR->kusatma_ustaligi;
+        }
+        else if (strstr(line, "\"deger\""))
+        {
+            if (current_level)
+            {
+                sscanf(line, " \"deger\": \"%d\"", &current_level->deger);
+            }
+        }
+        else if (strstr(line, "\"aciklama\""))
+        {
+            if (current_level)
+            {
+                char *start = strchr(line, ':') + 3;
+                strncpy(current_level->aciklama, start, strlen(start) - 2);
+                current_level->aciklama[strlen(start) - 2] = '\0';
+            }
+        }
+        else if (strstr(line, "\"seviye_1\""))
+        {
+            current_level = &current_research_type->seviye_1;
+        }
+        else if (strstr(line, "\"seviye_2\""))
+        {
+            current_level = &current_research_type->seviye_2;
+        }
+        else if (strstr(line, "\"seviye_3\""))
+        {
+            current_level = &current_research_type->seviye_3;
         }
     }
+
     fclose(file);
+
+    // OR için verileri kopyalama
+    memcpy(&OR->savunma_ustaligi, &HR->savunma_ustaligi, sizeof(Research_Type));
+    memcpy(&OR->saldiri_gelistirmesi, &HR->saldiri_gelistirmesi, sizeof(Research_Type));
+    memcpy(&OR->elit_egitim, &HR->elit_egitim, sizeof(Research_Type));
+    memcpy(&OR->kusatma_ustaligi, &HR->kusatma_ustaligi, sizeof(Research_Type));
 }

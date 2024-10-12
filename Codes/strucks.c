@@ -84,8 +84,3 @@ typedef struct {
     Research_Type elit_egitim;
     Research_Type kusatma_ustaligi;
 } Research;
-
-typedef struct {
-    Research Human_Research;
-    Research Ork_Research;
-} Research_Side;

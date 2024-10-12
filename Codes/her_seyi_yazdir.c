@@ -86,64 +86,64 @@ void yazdir_seviye(Seviye *seviye) {
     printf("Değer: %d, Açıklama: %s, Sayı: %d\n", seviye->deger, seviye->aciklama, seviye->sayi);
 }
 
-void yazdir_human_research(Research_Side *side) {
+void yazdir_human_research(Research *HR) {
     printf("Insan Arastirma: \n");
     printf("Savunma Ustalığı Seviye 1:\n");
-    yazdir_seviye(&side->Human_Research.savunma_ustaligi.seviye_1);
+    yazdir_seviye(&HR->savunma_ustaligi.seviye_1);
     printf("Savunma Ustalığı Seviye 2:\n");
-    yazdir_seviye(&side->Human_Research.savunma_ustaligi.seviye_2);
+    yazdir_seviye(&HR->savunma_ustaligi.seviye_2);
     printf("Savunma Ustalığı Seviye 3:\n");
-    yazdir_seviye(&side->Human_Research.savunma_ustaligi.seviye_3);
+    yazdir_seviye(&HR->savunma_ustaligi.seviye_3);
     
     printf("Saldırı Geliştirmesi Seviye 1:\n");
-    yazdir_seviye(&side->Human_Research.saldiri_gelistirmesi.seviye_1);
+    yazdir_seviye(&HR->saldiri_gelistirmesi.seviye_1);
     printf("Saldırı Geliştirmesi Seviye 2:\n");
-    yazdir_seviye(&side->Human_Research.saldiri_gelistirmesi.seviye_2);
+    yazdir_seviye(&HR->saldiri_gelistirmesi.seviye_2);
     printf("Saldırı Geliştirmesi Seviye 3:\n");
-    yazdir_seviye(&side->Human_Research.saldiri_gelistirmesi.seviye_3);
+    yazdir_seviye(&HR->saldiri_gelistirmesi.seviye_3);
 
     printf("Elit Eğitim Seviye 1:\n");
-    yazdir_seviye(&side->Human_Research.elit_egitim.seviye_1);
+    yazdir_seviye(&HR->elit_egitim.seviye_1);
     printf("Elit Eğitim Seviye 2:\n");
-    yazdir_seviye(&side->Human_Research.elit_egitim.seviye_2);
+    yazdir_seviye(&HR->elit_egitim.seviye_2);
     printf("Elit Eğitim Seviye 3:\n");
-    yazdir_seviye(&side->Human_Research.elit_egitim.seviye_3);
+    yazdir_seviye(&HR->elit_egitim.seviye_3);
 
     printf("Kuşatma Ustalığı Seviye 1:\n");
-    yazdir_seviye(&side->Human_Research.kusatma_ustaligi.seviye_1);
+    yazdir_seviye(&HR->kusatma_ustaligi.seviye_1);
     printf("Kuşatma Ustalığı Seviye 2:\n");
-    yazdir_seviye(&side->Human_Research.kusatma_ustaligi.seviye_2);
+    yazdir_seviye(&HR->kusatma_ustaligi.seviye_2);
     printf("Kuşatma Ustalığı Seviye 3:\n");
-    yazdir_seviye(&side->Human_Research.kusatma_ustaligi.seviye_3);
+    yazdir_seviye(&HR->kusatma_ustaligi.seviye_3);
 }
 
-void yazdir_ork_research(Research_Side *side) {
+void yazdir_ork_research(Research *OR) {
     printf("Ork Arastirma: \n");
     printf("Savunma Ustalığı Seviye 1:\n");
-    yazdir_seviye(&side->Ork_Research.savunma_ustaligi.seviye_1);
+    yazdir_seviye(&OR->savunma_ustaligi.seviye_1);
     printf("Savunma Ustalığı Seviye 2:\n");
-    yazdir_seviye(&side->Ork_Research.savunma_ustaligi.seviye_2);
+    yazdir_seviye(&OR->savunma_ustaligi.seviye_2);
     printf("Savunma Ustalığı Seviye 3:\n");
-    yazdir_seviye(&side->Ork_Research.savunma_ustaligi.seviye_3);
+    yazdir_seviye(&OR->savunma_ustaligi.seviye_3);
     
     printf("Saldırı Geliştirmesi Seviye 1:\n");
-    yazdir_seviye(&side->Ork_Research.saldiri_gelistirmesi.seviye_1);
+    yazdir_seviye(&OR->saldiri_gelistirmesi.seviye_1);
     printf("Saldırı Geliştirmesi Seviye 2:\n");
-    yazdir_seviye(&side->Ork_Research.saldiri_gelistirmesi.seviye_2);
+    yazdir_seviye(&OR->saldiri_gelistirmesi.seviye_2);
     printf("Saldırı Geliştirmesi Seviye 3:\n");
-    yazdir_seviye(&side->Ork_Research.saldiri_gelistirmesi.seviye_3);
+    yazdir_seviye(&OR->saldiri_gelistirmesi.seviye_3);
 
     printf("Elit Eğitim Seviye 1:\n");
-    yazdir_seviye(&side->Ork_Research.elit_egitim.seviye_1);
+    yazdir_seviye(&OR->elit_egitim.seviye_1);
     printf("Elit Eğitim Seviye 2:\n");
-    yazdir_seviye(&side->Ork_Research.elit_egitim.seviye_2);
+    yazdir_seviye(&OR->elit_egitim.seviye_2);
     printf("Elit Eğitim Seviye 3:\n");
-    yazdir_seviye(&side->Ork_Research.elit_egitim.seviye_3);
+    yazdir_seviye(&OR->elit_egitim.seviye_3);
 
     printf("Kuşatma Ustalığı Seviye 1:\n");
-    yazdir_seviye(&side->Ork_Research.kusatma_ustaligi.seviye_1);
+    yazdir_seviye(&OR->kusatma_ustaligi.seviye_1);
     printf("Kuşatma Ustalığı Seviye 2:\n");
-    yazdir_seviye(&side->Ork_Research.kusatma_ustaligi.seviye_2);
+    yazdir_seviye(&OR->kusatma_ustaligi.seviye_2);
     printf("Kuşatma Ustalığı Seviye 3:\n");
-    yazdir_seviye(&side->Ork_Research.kusatma_ustaligi.seviye_3);
+    yazdir_seviye(&OR->kusatma_ustaligi.seviye_3);
 }

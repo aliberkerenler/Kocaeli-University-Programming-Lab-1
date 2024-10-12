@@ -89,11 +89,6 @@ typedef struct {
     Research_Type kusatma_ustaligi;
 } Research;
 
-typedef struct {
-    Research Human_Research;
-    Research Ork_Research;
-} Research_Side;
-
 Human_Unit HU;
 Ork_Unit OU;
 Human_Hero HH;
@@ -101,8 +96,8 @@ Ork_Hero OH;
 Human_Creature HC;
 Ork_Creature OC;
 Research_Type RT;
-Research R;
-Research_Side RS;
+Research HR;
+Research OR;
 
 void parse_creature_json(const char *filename, Human_Creature *HC, Ork_Creature *OC)
 {
@@ -330,66 +325,66 @@ void yazdir_seviye(Seviye *seviye) {
     printf("Değer: %d, Açıklama: %s, Sayı: %d\n", seviye->deger, seviye->aciklama, seviye->sayi);
 }
 
-void yazdir_human_research(Research_Side *side) {
+void yazdir_human_research(Research *HR) {
     printf("Insan Arastirma: \n");
     printf("Savunma Ustalığı Seviye 1:\n");
-    yazdir_seviye(&side->Human_Research.savunma_ustaligi.seviye_1);
+    yazdir_seviye(&HR->savunma_ustaligi.seviye_1);
     printf("Savunma Ustalığı Seviye 2:\n");
-    yazdir_seviye(&side->Human_Research.savunma_ustaligi.seviye_2);
+    yazdir_seviye(&HR->savunma_ustaligi.seviye_2);
     printf("Savunma Ustalığı Seviye 3:\n");
-    yazdir_seviye(&side->Human_Research.savunma_ustaligi.seviye_3);
+    yazdir_seviye(&HR->savunma_ustaligi.seviye_3);
     
     printf("Saldırı Geliştirmesi Seviye 1:\n");
-    yazdir_seviye(&side->Human_Research.saldiri_gelistirmesi.seviye_1);
+    yazdir_seviye(&HR->saldiri_gelistirmesi.seviye_1);
     printf("Saldırı Geliştirmesi Seviye 2:\n");
-    yazdir_seviye(&side->Human_Research.saldiri_gelistirmesi.seviye_2);
+    yazdir_seviye(&HR->saldiri_gelistirmesi.seviye_2);
     printf("Saldırı Geliştirmesi Seviye 3:\n");
-    yazdir_seviye(&side->Human_Research.saldiri_gelistirmesi.seviye_3);
+    yazdir_seviye(&HR->saldiri_gelistirmesi.seviye_3);
 
     printf("Elit Eğitim Seviye 1:\n");
-    yazdir_seviye(&side->Human_Research.elit_egitim.seviye_1);
+    yazdir_seviye(&HR->elit_egitim.seviye_1);
     printf("Elit Eğitim Seviye 2:\n");
-    yazdir_seviye(&side->Human_Research.elit_egitim.seviye_2);
+    yazdir_seviye(&HR->elit_egitim.seviye_2);
     printf("Elit Eğitim Seviye 3:\n");
-    yazdir_seviye(&side->Human_Research.elit_egitim.seviye_3);
+    yazdir_seviye(&HR->elit_egitim.seviye_3);
 
     printf("Kuşatma Ustalığı Seviye 1:\n");
-    yazdir_seviye(&side->Human_Research.kusatma_ustaligi.seviye_1);
+    yazdir_seviye(&HR->kusatma_ustaligi.seviye_1);
     printf("Kuşatma Ustalığı Seviye 2:\n");
-    yazdir_seviye(&side->Human_Research.kusatma_ustaligi.seviye_2);
+    yazdir_seviye(&HR->kusatma_ustaligi.seviye_2);
     printf("Kuşatma Ustalığı Seviye 3:\n");
-    yazdir_seviye(&side->Human_Research.kusatma_ustaligi.seviye_3);
+    yazdir_seviye(&HR->kusatma_ustaligi.seviye_3);
 }
 
-void yazdir_ork_research(Research_Side *side) {
+void yazdir_ork_research(Research *OR) {
     printf("Ork Arastirma: \n");
     printf("Savunma Ustalığı Seviye 1:\n");
-    yazdir_seviye(&side->Ork_Research.savunma_ustaligi.seviye_1);
+    yazdir_seviye(&OR->savunma_ustaligi.seviye_1);
     printf("Savunma Ustalığı Seviye 2:\n");
-    yazdir_seviye(&side->Ork_Research.savunma_ustaligi.seviye_2);
+    yazdir_seviye(&OR->savunma_ustaligi.seviye_2);
     printf("Savunma Ustalığı Seviye 3:\n");
-    yazdir_seviye(&side->Ork_Research.savunma_ustaligi.seviye_3);
+    yazdir_seviye(&OR->savunma_ustaligi.seviye_3);
     
     printf("Saldırı Geliştirmesi Seviye 1:\n");
-    yazdir_seviye(&side->Ork_Research.saldiri_gelistirmesi.seviye_1);
+    yazdir_seviye(&OR->saldiri_gelistirmesi.seviye_1);
     printf("Saldırı Geliştirmesi Seviye 2:\n");
-    yazdir_seviye(&side->Ork_Research.saldiri_gelistirmesi.seviye_2);
+    yazdir_seviye(&OR->saldiri_gelistirmesi.seviye_2);
     printf("Saldırı Geliştirmesi Seviye 3:\n");
-    yazdir_seviye(&side->Ork_Research.saldiri_gelistirmesi.seviye_3);
+    yazdir_seviye(&OR->saldiri_gelistirmesi.seviye_3);
 
     printf("Elit Eğitim Seviye 1:\n");
-    yazdir_seviye(&side->Ork_Research.elit_egitim.seviye_1);
+    yazdir_seviye(&OR->elit_egitim.seviye_1);
     printf("Elit Eğitim Seviye 2:\n");
-    yazdir_seviye(&side->Ork_Research.elit_egitim.seviye_2);
+    yazdir_seviye(&OR->elit_egitim.seviye_2);
     printf("Elit Eğitim Seviye 3:\n");
-    yazdir_seviye(&side->Ork_Research.elit_egitim.seviye_3);
+    yazdir_seviye(&OR->elit_egitim.seviye_3);
 
     printf("Kuşatma Ustalığı Seviye 1:\n");
-    yazdir_seviye(&side->Ork_Research.kusatma_ustaligi.seviye_1);
+    yazdir_seviye(&OR->kusatma_ustaligi.seviye_1);
     printf("Kuşatma Ustalığı Seviye 2:\n");
-    yazdir_seviye(&side->Ork_Research.kusatma_ustaligi.seviye_2);
+    yazdir_seviye(&OR->kusatma_ustaligi.seviye_2);
     printf("Kuşatma Ustalığı Seviye 3:\n");
-    yazdir_seviye(&side->Ork_Research.kusatma_ustaligi.seviye_3);
+    yazdir_seviye(&OR->kusatma_ustaligi.seviye_3);
 }
 
 void parse_hero_json(const char *filename, Human_Hero *HH, Ork_Hero *OH)
@@ -507,7 +502,7 @@ void parse_hero_json(const char *filename, Human_Hero *HH, Ork_Hero *OH)
     fclose(file);
 }
 
-void parse_research_json(const char *filename, Research *R)
+void parse_research_json(const char *filename, Research *HR, Research *OR)
 {
     FILE *file = fopen(filename, "r");
     if (file == NULL)
@@ -517,81 +512,67 @@ void parse_research_json(const char *filename, Research *R)
     }
 
     char line[256];
+    Research_Type *current_research_type = NULL;
+    Seviye *current_level = NULL;
+
     while (fgets(line, sizeof(line), file))
     {
-        if (strstr(line, "\"savunma_ustaligi\"") != NULL)
+        if (strstr(line, "\"savunma_ustaligi\""))
         {
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->savunma_ustaligi.seviye_1.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->savunma_ustaligi.seviye_1.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->savunma_ustaligi.seviye_2.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->savunma_ustaligi.seviye_2.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->savunma_ustaligi.seviye_3.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->savunma_ustaligi.seviye_3.aciklama);
+            current_research_type = &HR->savunma_ustaligi;
         }
-        if (strstr(line, "\"saldiri_gelistirmesi\"") != NULL)
+        else if (strstr(line, "\"saldiri_gelistirmesi\""))
         {
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->saldiri_gelistirmesi.seviye_1.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->saldiri_gelistirmesi.seviye_1.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->saldiri_gelistirmesi.seviye_2.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->saldiri_gelistirmesi.seviye_2.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->saldiri_gelistirmesi.seviye_3.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->saldiri_gelistirmesi.seviye_3.aciklama);
+            current_research_type = &HR->saldiri_gelistirmesi;
         }
-        if (strstr(line, "\"elit_egitim\"") != NULL)
+        else if (strstr(line, "\"elit_egitim\""))
         {
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->elit_egitim.seviye_1.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->elit_egitim.seviye_1.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\": \"%d\",", &R->elit_egitim.seviye_2.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->elit_egitim.seviye_2.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->elit_egitim.seviye_3.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->elit_egitim.seviye_3.aciklama);
+            current_research_type = &HR->elit_egitim;
         }
-        if (strstr(line, "\"kusatma_ustaligi\"") != NULL)
+        else if (strstr(line, "\"kusatma_ustaligi\""))
         {
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->kusatma_ustaligi.seviye_1.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->kusatma_ustaligi.seviye_1.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->kusatma_ustaligi.seviye_2.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->kusatma_ustaligi.seviye_2.aciklama);
-
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"deger\" : \"%d\",", &R->kusatma_ustaligi.seviye_3.deger);
-            fgets(line, sizeof(line), file);
-            sscanf(line, " \"aciklama\" : \"%[^\"]\"", &R->kusatma_ustaligi.seviye_3.aciklama);
+            current_research_type = &HR->kusatma_ustaligi;
+        }
+        else if (strstr(line, "\"deger\""))
+        {
+            if (current_level)
+            {
+                sscanf(line, " \"deger\": \"%d\"", &current_level->deger);
+            }
+        }
+        else if (strstr(line, "\"aciklama\""))
+        {
+            if (current_level)
+            {
+                char *start = strchr(line, ':') + 3;
+                strncpy(current_level->aciklama, start, strlen(start) - 2);
+                current_level->aciklama[strlen(start) - 2] = '\0';
+            }
+        }
+        else if (strstr(line, "\"seviye_1\""))
+        {
+            current_level = &current_research_type->seviye_1;
+        }
+        else if (strstr(line, "\"seviye_2\""))
+        {
+            current_level = &current_research_type->seviye_2;
+        }
+        else if (strstr(line, "\"seviye_3\""))
+        {
+            current_level = &current_research_type->seviye_3;
         }
     }
+
     fclose(file);
+
+    // OR için verileri kopyalama
+    memcpy(&OR->savunma_ustaligi, &HR->savunma_ustaligi, sizeof(Research_Type));
+    memcpy(&OR->saldiri_gelistirmesi, &HR->saldiri_gelistirmesi, sizeof(Research_Type));
+    memcpy(&OR->elit_egitim, &HR->elit_egitim, sizeof(Research_Type));
+    memcpy(&OR->kusatma_ustaligi, &HR->kusatma_ustaligi, sizeof(Research_Type));
 }
 
-void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH, Human_Creature *HC, Ork_Creature *OC, Research_Side *RS)
+void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH, Human_Creature *HC, Ork_Creature *OC, Research *HR, Research *OR)
 {
     if (file == NULL)
     {
@@ -624,71 +605,72 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 }
                 if (strstr(line, "\"Alparslan\"") != NULL)
                 {
-                    HH->alparslan.sayi++;
+                    HH->alparslan.sayi = 1;
                 }
                 if (strstr(line, "\"Fatih_Sultan_Mehmet\"") != NULL)
                 {
-                    HH->fsm.sayi++;
+                    HH->fsm.sayi = 1;
                 }
                 if (strstr(line, "\"Yavuz_Sultan_Selim\"") != NULL)
                 {
-                    HH->yss.sayi++;
+                    HH->yss.sayi = 1;
                 }
                 if (strstr(line, "\"Tugrul_Bey\"") != NULL)
                 {
-                    HH->tugrul_bey.sayi++;
+                    HH->tugrul_bey.sayi = 1;
                 }
                 if (strstr(line, "\"Ejderha\"") != NULL)
                 {
-                    HC->ejderha.sayi++;
+                    HC->ejderha.sayi = 1;
                 }
                 if (strstr(line, "\"Agri_Dagi\"") != NULL)
                 {
-                    HC->agri_dagi.sayi++;
+                    HC->agri_dagi.sayi = 1;
                 }
                 if (strstr(line, "\"Tepegoz\"") != NULL)
                 {
-                    HC->tepegoz.sayi++;
+                    HC->tepegoz.sayi = 1;
                 }
                 if (strstr(line, "\"Karakurt\"") != NULL)
                 {
-                    HC->karakurt.sayi++;
+                    HC->karakurt.sayi = 1;
                 }
                 if (strstr(line, "\"Samur\"") != NULL) 
                 {
-                    HC->samur.sayi++;
+                    HC->samur.sayi = 1;
                 }
-                if (strstr(line, "savunma_ustaligi") != NULL)
+                printf("a");
+                if (strstr(line, "\"savunma_ustaligi\"") != NULL)
                 {
-                    sscanf(line, " \"savunma_ustaligi\" : %d,", &value);
-                
+                    sscanf(line, "\"savunma_ustaligi\" : %d", &value);
+                    printf("%d",value);
                     if (value == 1)
                     {
-                        RS->Human_Research.savunma_ustaligi.seviye_1.sayi++;
+                        HR->savunma_ustaligi.seviye_1.sayi = 1;
                     }
                     else if (value == 2)
                     {
-                        RS->Human_Research.savunma_ustaligi.seviye_2.sayi++;
+                        HR->savunma_ustaligi.seviye_2.sayi = 1;
                     }
                     else if (value == 3)
                     {
-                        RS->Human_Research.savunma_ustaligi.seviye_3.sayi++;
+                        HR->savunma_ustaligi.seviye_3.sayi = 1;
                     }
                 }
-                if (strstr(line, "saldiri_gelistirmesi") != NULL)
+                if (strstr(line, "\"saldiri_gelistirmesi\"") != NULL)
                 {
                     sscanf(line, " \"saldiri_gelistirmesi\" : %d,", &value);
                     if (value == 1)
                     {
-                        RS->Human_Research.saldiri_gelistirmesi.seviye_1.sayi++;
+                        HR->saldiri_gelistirmesi.seviye_1.sayi++;
                     }
                     else if (value == 2)
                     {
-                        RS->Human_Research.saldiri_gelistirmesi.seviye_2.sayi++;
+                        HR->saldiri_gelistirmesi.seviye_2.sayi++;
                     }
                     else if (value == 3)
                     {
-                        RS->Human_Research.saldiri_gelistirmesi.seviye_3.sayi++;
+                        HR->saldiri_gelistirmesi.seviye_3.sayi++;
                     }
                 }   
                 if (strstr(line, "elit_egitim") != NULL)
@@ -696,15 +678,15 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                     sscanf(line, " \"elit_egitim\" : %d,", &value);
                     if (value == 1)
                     {
-                        RS->Human_Research.elit_egitim.seviye_1.sayi++;
+                        HR->elit_egitim.seviye_1.sayi++;
                     }
                     else if (value == 2)
                     {
-                        RS->Human_Research.elit_egitim.seviye_2.sayi++;
+                        HR->elit_egitim.seviye_2.sayi++;
                     }
                     else if (value == 3)
                     {
-                        RS->Human_Research.elit_egitim.seviye_3.sayi++;
+                        HR->elit_egitim.seviye_3.sayi++;
                     }
                 }
                 if (strstr(line, "kusatma_ustaligi") != NULL)
@@ -712,15 +694,15 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                     sscanf(line, " \"kusatma_ustaligi\" : %d,", &value);
                     if (value == 1)
                     {
-                        RS->Human_Research.kusatma_ustaligi.seviye_1.sayi++;
+                        HR->kusatma_ustaligi.seviye_1.sayi++;
                     }
                     else if (value == 2)
                     {
-                        RS->Human_Research.kusatma_ustaligi.seviye_2.sayi++;
+                        HR->kusatma_ustaligi.seviye_2.sayi++;
                     }
                     else if (value == 3)
                     {
-                        RS->Human_Research.kusatma_ustaligi.seviye_3.sayi++;
+                        HR->kusatma_ustaligi.seviye_3.sayi++;
                     }
                 }
             }
@@ -788,15 +770,15 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 
                     if (value == 1)
                     {
-                        RS->Ork_Research.savunma_ustaligi.seviye_1.sayi++;
+                        OR->savunma_ustaligi.seviye_1.sayi++;
                     }
                     else if (value == 2)
                     {
-                        RS->Ork_Research.savunma_ustaligi.seviye_2.sayi++;
+                        OR->savunma_ustaligi.seviye_2.sayi++;
                     }
                     else if (value == 3)
                     {
-                        RS->Ork_Research.savunma_ustaligi.seviye_3.sayi++;
+                        OR->savunma_ustaligi.seviye_3.sayi++;
                     }
                 }
                 if (strstr(line, "saldiri_gelistirmesi") != NULL)
@@ -804,15 +786,15 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                     sscanf(line, " \"saldiri_gelistirmesi\" : %d,", &value);
                     if (value == 1)
                     {
-                        RS->Ork_Research.saldiri_gelistirmesi.seviye_1.sayi++;
+                        OR->saldiri_gelistirmesi.seviye_1.sayi++;
                     }
                     else if (value == 2)
                     {
-                        RS->Ork_Research.saldiri_gelistirmesi.seviye_2.sayi++;
+                        OR->saldiri_gelistirmesi.seviye_2.sayi++;
                     }
                     else if (value == 3)
                     {
-                        RS->Ork_Research.saldiri_gelistirmesi.seviye_3.sayi++;
+                        OR->saldiri_gelistirmesi.seviye_3.sayi++;
                     }
                 }   
                 if (strstr(line, "elit_egitim") != NULL)
@@ -820,15 +802,15 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                     sscanf(line, " \"elit_egitim\" : %d,", &value);
                     if (value == 1)
                     {
-                        RS->Ork_Research.elit_egitim.seviye_1.sayi++;
+                        OR->elit_egitim.seviye_1.sayi++;
                     }
                     else if (value == 2)
                     {
-                        RS->Ork_Research.elit_egitim.seviye_2.sayi++;
+                        OR->elit_egitim.seviye_2.sayi++;
                     }
                     else if (value == 3)
                     {
-                        RS->Ork_Research.elit_egitim.seviye_3.sayi++;
+                        OR->elit_egitim.seviye_3.sayi++;
                     }
                 }
                 if (strstr(line, "kusatma_ustaligi") != NULL)
@@ -836,15 +818,15 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                     sscanf(line, " \"kusatma_ustaligi\" : %d,", &value);
                     if (value == 1)
                     {
-                        RS->Ork_Research.kusatma_ustaligi.seviye_1.sayi++;
+                        OR->kusatma_ustaligi.seviye_1.sayi++;
                     }
                     else if (value == 2)
                     {
-                        RS->Ork_Research.kusatma_ustaligi.seviye_2.sayi++;
+                        OR->kusatma_ustaligi.seviye_2.sayi++;
                     }
                     else if (value == 3)
                     {
-                        RS->Ork_Research.kusatma_ustaligi.seviye_3.sayi++;
+                        OR->kusatma_ustaligi.seviye_3.sayi++;
                     }
                 }
             }
@@ -964,11 +946,10 @@ int main()
     parse_unit_json("unit_types.json", &HU, &OU);
     parse_hero_json("heroes.json", &HH, &OH);
     parse_creature_json("creatures.json", &HC, &OC);
-    parse_research_json("research.json", &R);
+    parse_research_json("research.json", &HR, &OR);
 
     FILE *file = fopen("1.json", "r");
-    parse_scenario_file(file, &HU, &OU, &HH, &OH, &HC, &OC, &RS);
-
+    parse_scenario_file(file, &HU, &OU, &HH, &OH, &HC, &OC, &HR, &OR);
 
    // yazdir_human_unit(&HU); // her seyi okuyo
    // yazdir_ork_unit(&OU); // her seyi okuyo
@@ -976,8 +957,8 @@ int main()
    // yazdir_ork_hero(&OH);  // sayi haric her sey
    // yazdir_human_creature(&HC); // sayi haric her sey
    // yazdir_ork_creature(&OC);   // sayi haric her sey
-   // yazdir_human_research(&RS);  // hicbi sey yok
-   // yazdir_ork_research(&RS);  // hicbi sey yok
+   // yazdir_human_research(&HR);  // sayi haric her sey
+   // yazdir_ork_research(&OR);  // sayi haric her sey
 
     fclose(file);
     return 0;
