@@ -6,12 +6,12 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
         return;
     }
     char line[256];
-    int value;
+    int value = 0;
     while (fgets(line, sizeof(line), file))
     {
         if (strstr(line, "\"insan_imparatorlugu\": {") != NULL)
         {
-            while (fgets(line, sizeof(line), file) && !strstr(line, "},"))
+            while (fgets(line, sizeof(line), file) && !strstr(line, "ork_legi"))
             {
                 if (strstr(line, "\"piyadeler\"") != NULL)
                 {
@@ -65,11 +65,9 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 {
                     HC->samur.sayi = 1;
                 }
-                printf("a");
                 if (strstr(line, "\"savunma_ustaligi\"") != NULL)
                 {
-                    sscanf(line, "\"savunma_ustaligi\" : %d", &value);
-                    printf("%d",value);
+                    sscanf(line, " \"%*[^\"]\": %d", &value);
                     if (value == 1)
                     {
                         HR->savunma_ustaligi.seviye_1.sayi = 1;
@@ -85,7 +83,7 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 }
                 if (strstr(line, "\"saldiri_gelistirmesi\"") != NULL)
                 {
-                    sscanf(line, " \"saldiri_gelistirmesi\" : %d,", &value);
+                    sscanf(line, " \"%*[^\"]\": %d", &value);
                     if (value == 1)
                     {
                         HR->saldiri_gelistirmesi.seviye_1.sayi++;
@@ -101,7 +99,7 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 }   
                 if (strstr(line, "elit_egitim") != NULL)
                 {
-                    sscanf(line, " \"elit_egitim\" : %d,", &value);
+                    sscanf(line, " \"%*[^\"]\": %d", &value);
                     if (value == 1)
                     {
                         HR->elit_egitim.seviye_1.sayi++;
@@ -117,7 +115,7 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 }
                 if (strstr(line, "kusatma_ustaligi") != NULL)
                 {
-                    sscanf(line, " \"kusatma_ustaligi\" : %d,", &value);
+                    sscanf(line, " \"%*[^\"]\": %d", &value);
                     if (value == 1)
                     {
                         HR->kusatma_ustaligi.seviye_1.sayi++;
@@ -136,7 +134,7 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
         
         if (strstr(line, "\"ork_legi\": {") != NULL)
         {
-            while (fgets(line, sizeof(line), file) && !strstr(line, "},"))
+            while (fgets(line, sizeof(line), file) && !strstr(line, "insan_imparatorlugu"))
             {
                 if (strstr(line, "ork_dovusculeri") != NULL)
                 {
@@ -192,8 +190,7 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 }
                 if (strstr(line, "savunma_ustaligi") != NULL)
                 {
-                    sscanf(line, " \"savunma_ustaligi\" : %d,", &value);
-                
+                    sscanf(line, " \"%*[^\"]\": %d", &value);               
                     if (value == 1)
                     {
                         OR->savunma_ustaligi.seviye_1.sayi++;
@@ -209,7 +206,7 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 }
                 if (strstr(line, "saldiri_gelistirmesi") != NULL)
                 {
-                    sscanf(line, " \"saldiri_gelistirmesi\" : %d,", &value);
+                    sscanf(line, " \"%*[^\"]\": %d", &value);
                     if (value == 1)
                     {
                         OR->saldiri_gelistirmesi.seviye_1.sayi++;
@@ -225,7 +222,7 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 }   
                 if (strstr(line, "elit_egitim") != NULL)
                 {
-                    sscanf(line, " \"elit_egitim\" : %d,", &value);
+                    sscanf(line, " \"%*[^\"]\": %d", &value);
                     if (value == 1)
                     {
                         OR->elit_egitim.seviye_1.sayi++;
@@ -241,7 +238,7 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 }
                 if (strstr(line, "kusatma_ustaligi") != NULL)
                 {
-                    sscanf(line, " \"kusatma_ustaligi\" : %d,", &value);
+                    sscanf(line, " \"%*[^\"]\": %d", &value);
                     if (value == 1)
                     {
                         OR->kusatma_ustaligi.seviye_1.sayi++;
