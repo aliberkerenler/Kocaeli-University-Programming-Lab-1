@@ -565,15 +565,15 @@ void parse_research_json(const char *filename, Research *HR, Research *OR)
 
     fclose(file);
 
-    // OR için verileri kopyalama
     memcpy(&OR->savunma_ustaligi, &HR->savunma_ustaligi, sizeof(Research_Type));
     memcpy(&OR->saldiri_gelistirmesi, &HR->saldiri_gelistirmesi, sizeof(Research_Type));
     memcpy(&OR->elit_egitim, &HR->elit_egitim, sizeof(Research_Type));
     memcpy(&OR->kusatma_ustaligi, &HR->kusatma_ustaligi, sizeof(Research_Type));
 }
 
-void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH, Human_Creature *HC, Ork_Creature *OC, Research *HR, Research *OR)
+void read_human_scenario(const char *filename, Human_Unit *HU, Human_Hero *HH, Human_Creature *HC, Research *HR)
 {
+    FILE *file = fopen(filename, "r");
     if (file == NULL)
     {
         printf("Dosya Acilamadi!\n");
@@ -623,7 +623,7 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 {
                     HC->ejderha.sayi = 1;
                 }
-                if (strstr(line, "\"Agri_Dagi\"") != NULL)
+                if (strstr(line, "\"Agri_Dagi_Devleri\"") != NULL)
                 {
                     HC->agri_dagi.sayi = 1;
                 }
@@ -705,7 +705,22 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 }
             }
         }
-        
+    }
+    fclose(file);
+}
+
+void read_ork_scenario(const char *filename, Ork_Unit *OU, Ork_Hero *OH, Ork_Creature *OC, Research *OR)
+{
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+    {
+        printf("Dosya Acilamadi!\n");
+        return;
+    }
+    char line[256];
+    int value = 0;
+    while (fgets(line, sizeof(line), file))
+    {   
         if (strstr(line, "\"ork_legi\": {") != NULL)
         {
             while (fgets(line, sizeof(line), file) && !strstr(line, "insan_imparatorlugu"))
@@ -742,15 +757,15 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 {
                     OH->ugar.sayi++;
                 }
-                if (strstr(line, "\"Troll\"") != NULL)
+                if (strstr(line, "\"Kara_Troll\"") != NULL)
                 {
                     OC->troll.sayi++;
                 }
-                if (strstr(line, "\"Golge\"") != NULL)
+                if (strstr(line, "\"Golge_Kurtlari\"") != NULL)
                 {
                     OC->golge.sayi++;
                 }
-                if (strstr(line, "\"Camur\"") != NULL)
+                if (strstr(line, "\"Camur_Devleri\"") != NULL)
                 {
                     OC->camur.sayi++;
                 }
@@ -758,7 +773,7 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 {
                     OC->ates_iblisi.sayi++;
                 }
-                if (strstr(line, "\"Buz_Devi\"") != NULL)
+                if (strstr(line, "\"Buz_Devleri\"") != NULL)
                 {
                     OC->buz_devi.sayi++;
                 }
@@ -828,7 +843,6 @@ void parse_scenario_file(FILE *file, Human_Unit *HU, Ork_Unit *OU, Human_Hero *H
                 }
             }
         }
-
     }
     fclose(file);
 }
@@ -945,17 +959,24 @@ int main()
     parse_creature_json("creatures.json", &HC, &OC);
     parse_research_json("research.json", &HR, &OR);
 
-    FILE *file = fopen("8.json", "r");
-    parse_scenario_file(file, &HU, &OU, &HH, &OH, &HC, &OC, &HR, &OR);
-    yazdir_human_unit(&HU);       //her seyi okuyo
-   // yazdir_ork_unit(&OU);         //her seyi okuyo
-   // yazdir_human_hero(&HH);       //her seyi okuyo
-   // yazdir_ork_hero(&OH);         //her seyi okuyo
-   // yazdir_human_creature(&HC);   //her seyi okuyo
-   // yazdir_ork_creature(&OC);     //her seyi okuyo
-   // yazdir_human_research(&HR);   //her seyi okuyo
-   // yazdir_ork_research(&OR);     //her seyi okuyo
+    read_ork_scenario("9.json", &OU, &OH, &OC, &OR);
+    read_human_scenario("9.json", &HU, &HH, &HC, &HR);
+    //yazdir_human_unit(&HU);       //her seyi okuyo
+    //printf("\n\n");
+    //yazdir_ork_unit(&OU);         //her seyi okuyo
+    //printf("\n\n");
+    //yazdir_human_hero(&HH);       //her seyi okuyo
+    //printf("\n\n");
+    //yazdir_ork_hero(&OH);         //her seyi okuyo
+    //printf("\n\n");
+    //yazdir_human_creature(&HC);   //her seyi okuyo
+    //printf("\n\n");
+    //yazdir_ork_creature(&OC);     //her seyi okuyo
+    //printf("\n\n");
+    //yazdir_human_research(&HR);   //her seyi okuyo
+    //printf("\n\n");
+    //yazdir_ork_research(&OR);     //her seyi okuyo
+    //printf("\n\n");
 
-    fclose(file);
     return 0;
 }
