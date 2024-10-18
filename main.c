@@ -824,7 +824,7 @@ void parse_unit_json(const char *filename, Human_Unit *HU, Ork_Unit *OU)
     fclose(file);
 }
 
-void saldiri_gucu_hesapla(Human_Unit *HU, Ork_Unit *OU,  int *toplam_insan_saldiri, int *toplam_ork_saldiri) {
+void saldiri_gucu_hesapla(Human_Unit *HU, Ork_Unit *OU,  double *toplam_insan_saldiri, double *toplam_ork_saldiri) {
     
     *toplam_insan_saldiri = (HU->piyadeler.saldiri * HU->piyadeler.sayi) +
                             (HU->okcular.saldiri * HU->okcular.sayi) +     
@@ -838,7 +838,7 @@ void saldiri_gucu_hesapla(Human_Unit *HU, Ork_Unit *OU,  int *toplam_insan_saldi
 }
 
 //Savunma gucu hesaplayan Fonksiyon
-void savunma_gucu_hesapla(Human_Unit *HU , Ork_Unit *OU ,int *toplam_insan_savunma , int *toplam_ork_savunma) {
+void savunma_gucu_hesapla(Human_Unit *HU , Ork_Unit *OU ,double *toplam_insan_savunma , double *toplam_ork_savunma) {
 
     *toplam_insan_savunma = (HU->piyadeler.savunma * HU->piyadeler.sayi) + 
                             (HU->okcular.savunma * HU->okcular.sayi) +     
@@ -852,7 +852,7 @@ void savunma_gucu_hesapla(Human_Unit *HU , Ork_Unit *OU ,int *toplam_insan_savun
 
 }
 
-void saglik_hesapla(Human_Unit *HU, Ork_Unit *OU, int net_hasar_insan, double net_hasar_ork, int *toplam_insan_savunma, int *toplam_ork_savunma) {
+void saglik_hesapla(Human_Unit *HU, Ork_Unit *OU, double net_hasar_insan, double net_hasar_ork, double *toplam_insan_savunma, double *toplam_ork_savunma) {
    
    // Oran Hesaplama
 
@@ -898,26 +898,26 @@ void saglik_hesapla(Human_Unit *HU, Ork_Unit *OU, int net_hasar_insan, double ne
 
 
     // Hasar Dağılımı
-    int hasar_piyadeler = net_hasar_ork * oran_piyadeler;
-    int hasar_okcular = net_hasar_ork * oran_okcular;
-    int hasar_suvariler = net_hasar_ork * oran_suvariler;
-    int hasar_kusatma = net_hasar_ork * oran_kusatma;
+    double hasar_piyadeler = net_hasar_ork * oran_piyadeler;
+    double hasar_okcular = net_hasar_ork * oran_okcular;
+    double hasar_suvariler = net_hasar_ork * oran_suvariler;
+    double hasar_kusatma = net_hasar_ork * oran_kusatma;
 
-    int hasar_ork_dovusculeri = net_hasar_insan * oran_ork_dovusculeri;
-    int hasar_mizrakcilar = net_hasar_insan * oran_mizrakcilar;
-    int hasar_varg_binicileri = net_hasar_insan * oran_varg_binicileri;
-    int hasar_troller = net_hasar_insan * oran_troller;
+    double hasar_ork_dovusculeri = net_hasar_insan * oran_ork_dovusculeri;
+    double hasar_mizrakcilar = net_hasar_insan * oran_mizrakcilar;
+    double hasar_varg_binicileri = net_hasar_insan * oran_varg_binicileri;
+    double hasar_troller = net_hasar_insan * oran_troller;
 
      // Kayıpları Hesaplama
-    int kayip_piyadeler = hasar_piyadeler / HU->piyadeler.saglik;
-    int kayip_okcular = hasar_okcular / HU->okcular.saglik;
-    int kayip_suvariler = hasar_suvariler / HU->suvariler.saglik;
-    int kayip_kusatma = hasar_kusatma / HU->kusatma_makineleri.saglik;
+    double kayip_piyadeler = hasar_piyadeler / HU->piyadeler.saglik;
+    double kayip_okcular = hasar_okcular / HU->okcular.saglik;
+    double kayip_suvariler = hasar_suvariler / HU->suvariler.saglik;
+    double kayip_kusatma = hasar_kusatma / HU->kusatma_makineleri.saglik;
 
-    int kayip_ork_dovusculeri = hasar_ork_dovusculeri / OU->ork_dovusculeri.saglik;
-    int kayip_mizrakcilar = hasar_mizrakcilar / OU->mizrakcilar.saglik;
-    int kayip_varg_binicileri = hasar_varg_binicileri / OU->varg_binicileri.saglik;
-    int kayip_troller = hasar_troller / OU->troller.saglik;
+    double kayip_ork_dovusculeri = hasar_ork_dovusculeri / OU->ork_dovusculeri.saglik;
+    double kayip_mizrakcilar = hasar_mizrakcilar / OU->mizrakcilar.saglik;
+    double kayip_varg_binicileri = hasar_varg_binicileri / OU->varg_binicileri.saglik;
+    double kayip_troller = hasar_troller / OU->troller.saglik;
 
      // Birim sayılarının güncellenmesi
     
@@ -950,9 +950,7 @@ void saglik_hesapla(Human_Unit *HU, Ork_Unit *OU, int net_hasar_insan, double ne
 }
 
 
-    
-
-double insan_net_hasar_hesaplama(Human_Unit *HU, int *toplam_insan_saldiri, int *toplam_insan_savunma, int *toplam_ork_savunma)
+double insan_net_hasar_hesaplama(Human_Unit *HU, double *toplam_insan_saldiri, double *toplam_insan_savunma, double *toplam_ork_savunma)
 {
     double insan_net_hasar = *toplam_insan_saldiri * (1 - (*toplam_ork_savunma / *toplam_insan_saldiri));
     if (insan_net_hasar < 0)
@@ -960,7 +958,7 @@ double insan_net_hasar_hesaplama(Human_Unit *HU, int *toplam_insan_saldiri, int 
     return (insan_net_hasar);
 }
 
-double ork_net_hasar_hesaplama(Ork_Unit *OU, int *toplam_ork_saldiri, int *toplam_ork_savunma, int *toplam_insan_savunma)
+double ork_net_hasar_hesaplama(Ork_Unit *OU, double *toplam_ork_saldiri, double *toplam_ork_savunma, double *toplam_insan_savunma)
 {
     double ork_net_hasar = *toplam_ork_saldiri * (1 - (*toplam_insan_savunma / *toplam_ork_saldiri));
     if (ork_net_hasar < 0)
@@ -1273,6 +1271,8 @@ int main()
     read_ork_scenario("10.json", &OU, &OH, &OC, &OR);
     read_human_scenario("10.json", &HU, &HH, &HC, &HR);
 
+    add_bonus_value(&HU, &OU, &HH, &OH, &HC, &OC, &HR, &OR);
+
     int adim = 1;
    while ((HU.piyadeler.sayi != 0 || HU.okcular.sayi != 0 ||
          HU.suvariler.sayi != 0 || HU.kusatma_makineleri.sayi != 0) ||
@@ -1291,28 +1291,5 @@ int main()
     }
 }
 
-
-    int toplam_insan_saldiri = 0;
-    int toplam_insan_savunma = 0;
-    int toplam_ork_saldiri = 0;
-    int toplam_ork_savunma = 0;
-
-    //add_bonus_value(&HU, &OU, &HH, &OH, &HC, &OC, &HR, &OR);
-    //saldiri_gucu_hesapla(&HU, &OU, &toplam_insan_saldiri, &toplam_ork_saldiri);
-    //savunma_gucu_hesapla(&HU, &OU, &toplam_insan_savunma, &toplam_ork_savunma);
-
-    //double net_hasar_insan = insan_net_hasar_hesaplama(&HU, &toplam_insan_saldiri, &toplam_insan_savunma, &toplam_ork_savunma);
-    //double net_hasar_ork = ork_net_hasar_hesaplama(&OU, &toplam_ork_saldiri, &toplam_ork_savunma, &toplam_insan_savunma);
-
-    //printf("%.2f\n",net_hasar_insan);
-    //printf("%.2f\n\n",net_hasar_ork);
-
-
-   
-    //saglik_hesapla(&HU, &OU, net_hasar_insan, net_hasar_ork, &toplam_insan_savunma, &toplam_ork_savunma);
-
-    yazdir_human_unit(&HU);
-    printf("\n\n");
-    yazdir_ork_unit(&OU);
-    return 0;
+   return 0;
 }
