@@ -645,7 +645,7 @@ void read_ork_scenario(const char *filename, Ork_Unit *OU, Ork_Hero *OH, Ork_Cre
                 {
                     OC->ates_iblisi.sayi++;
                 }
-		if (strstr(line, "\"Makrog_Savas_Beyi\"") != NULL)
+                if (strstr(line, "\"Makrog_Savas_Beyi\"") != NULL)
                 {
                     OC->makrog.sayi++;
                 }
@@ -828,21 +828,40 @@ void parse_unit_json(const char *filename, Human_Unit *HU, Ork_Unit *OU)
     fclose(file);
 }
 
-void saldiri_gucu_hesapla(Human_Unit *HU, Ork_Unit *OU,  int *toplam_insan_saldiri, int *toplam_ork_saldiri) {
-    
-    *toplam_insan_saldiri = (HU->piyadeler.saldiri * HU->piyadeler.sayi) +
-                            (HU->okcular.saldiri * HU->okcular.sayi) +     
-                            (HU->suvariler.saldiri * HU->suvariler.sayi) +
-                            (HU->kusatma_makineleri.saldiri * HU->kusatma_makineleri.sayi); 
+int kritik_vurus_hesapla(Unit *unit, int adim)
+{
+    // Birimin kritik vuruş zamanını hesapla
+    if(unit->kritik_sans == 0)
+    {
+        return unit->saldiri * unit->sayi;
+    }
 
-    *toplam_ork_saldiri = (OU->ork_dovusculeri.saldiri * OU->ork_dovusculeri.sayi) + 
-                          (OU->mizrakcilar.saldiri * OU->mizrakcilar.sayi) +     
-                          (OU->varg_binicileri.saldiri * OU->varg_binicileri.sayi) + 
-                          (OU->troller.saldiri * OU->troller.sayi);           
+    if (adim % (100 / unit->kritik_sans) == 0)
+    { 
+        return unit->saldiri * unit->sayi * 1.5; // Kritik vuruş varsa hasarı artır
+    }
+
+    return unit->saldiri * unit->sayi; // Kritik vuruş yoksa normal hasar
+}
+
+// İnsanların toplam saldırı gücünü hesaplayan fonksiyon
+void saldiri_gucu_hesapla(Human_Unit *HU, Ork_Unit *OU , int adim , double *toplam_insan_saldiri , double *toplam_ork_saldiri)
+{
+    *toplam_insan_saldiri = kritik_vurus_hesapla(&HU->piyadeler , adim) + 
+                            kritik_vurus_hesapla(&HU->okcular , adim) + 
+                            kritik_vurus_hesapla(&HU->suvariler , adim) + 
+                            kritik_vurus_hesapla(&HU->kusatma_makineleri , adim) ;
+
+    
+    *toplam_ork_saldiri =   kritik_vurus_hesapla(&OU->ork_dovusculeri , adim) +
+                            kritik_vurus_hesapla(&OU->mizrakcilar , adim) +
+                            kritik_vurus_hesapla(&OU->varg_binicileri , adim) +
+                            kritik_vurus_hesapla(&OU->troller , adim);
+   
 }
 
 //SAvunma gucu hesaplayan Fonksiyon
-void savunma_gucu_hesapla(Human_Unit *HU , Ork_Unit *OU ,int *toplam_insan_savunma , int *toplam_ork_savunma) {
+void savunma_gucu_hesapla(Human_Unit *HU , Ork_Unit *OU ,double *toplam_insan_savunma , double *toplam_ork_savunma) {
 
     *toplam_insan_savunma = (HU->piyadeler.savunma * HU->piyadeler.sayi) + 
                             (HU->okcular.savunma * HU->okcular.sayi) +     
@@ -856,12 +875,10 @@ void savunma_gucu_hesapla(Human_Unit *HU , Ork_Unit *OU ,int *toplam_insan_savun
 
 }
 
-void saglik_hesapla(Human_Unit *HU, Ork_Unit *OU, int net_hasar_insan, int net_hasar_ork, int *toplam_insan_savunma, int *toplam_ork_savunma) {
+void ork_saglik_hesapla(Ork_Unit *OU, double net_hasar_insan, double *toplam_ork_savunma)
+{
    // Oran Hesaplama
-    double oran_piyadeler = (double)(HU->piyadeler.savunma * HU->piyadeler.sayi) / *toplam_insan_savunma;
-    double oran_okcular = (double)(HU->okcular.savunma * HU->okcular.sayi) / *toplam_insan_savunma;
-    double oran_suvariler = (double)(HU->suvariler.savunma * HU->suvariler.sayi) / *toplam_insan_savunma;
-    double oran_kusatma = (double)(HU->kusatma_makineleri.savunma * HU->kusatma_makineleri.sayi) / *toplam_insan_savunma;
+    
 
     double oran_ork_dovusculeri = (double)(OU->ork_dovusculeri.savunma * OU->ork_dovusculeri.sayi) / *toplam_ork_savunma;
     double oran_mizrakcilar = (double)(OU->mizrakcilar.savunma * OU->mizrakcilar.sayi) / *toplam_ork_savunma;
@@ -869,40 +886,56 @@ void saglik_hesapla(Human_Unit *HU, Ork_Unit *OU, int net_hasar_insan, int net_h
     double oran_troller = (double)(OU->troller.savunma * OU->troller.sayi) / *toplam_ork_savunma;
 
     // Hasar Dağılımı
-    int hasar_piyadeler = net_hasar_ork * oran_piyadeler;
-    int hasar_okcular = net_hasar_ork * oran_okcular;
-    int hasar_suvariler = net_hasar_ork * oran_suvariler;
-    int hasar_kusatma = net_hasar_ork * oran_kusatma;
+    
 
-    int hasar_ork_dovusculeri = net_hasar_insan * oran_ork_dovusculeri;
-    int hasar_mizrakcilar = net_hasar_insan * oran_mizrakcilar;
-    int hasar_varg_binicileri = net_hasar_insan * oran_varg_binicileri;
-    int hasar_troller = net_hasar_insan * oran_troller;
+    double hasar_ork_dovusculeri = net_hasar_insan * oran_ork_dovusculeri;
+    double hasar_mizrakcilar = net_hasar_insan * oran_mizrakcilar;
+    double hasar_varg_binicileri = net_hasar_insan * oran_varg_binicileri;
+    double hasar_troller = net_hasar_insan * oran_troller;
 
-    // Sağlık Güncelleme
-    HU->piyadeler.saglik -= hasar_piyadeler;
-    HU->okcular.saglik -= hasar_okcular;
-    HU->suvariler.saglik -= hasar_suvariler;
-    HU->kusatma_makineleri.saglik -= hasar_kusatma;
 
-    OU->ork_dovusculeri.saglik -= hasar_ork_dovusculeri;
-    OU->mizrakcilar.saglik -= hasar_mizrakcilar;
-    OU->varg_binicileri.saglik -= hasar_varg_binicileri;
-    OU->troller.saglik -= hasar_troller;
+    OU->ork_dovusculeri.sayi -= (hasar_ork_dovusculeri / OU->ork_dovusculeri.saglik);
+    OU->mizrakcilar.sayi -= (hasar_mizrakcilar / OU->mizrakcilar.saglik);
+    OU->varg_binicileri.sayi -= (hasar_varg_binicileri / OU->varg_binicileri.saglik);
+    OU->troller.sayi -= (hasar_troller / OU->troller.saglik);
 
     // Sağlık 0'ın altına düşerse, 0'da sabitle.
-    if (HU->piyadeler.saglik <= 0) HU->piyadeler.saglik = 0;
-    if (HU->okcular.saglik <= 0) HU->okcular.saglik = 0;
-    if (HU->suvariler.saglik <= 0) HU->suvariler.saglik = 0;
-    if (HU->kusatma_makineleri.saglik <= 0) HU->kusatma_makineleri.saglik = 0;
-
-    if (OU->ork_dovusculeri.saglik <= 0) OU->ork_dovusculeri.saglik = 0;
-    if (OU->mizrakcilar.saglik <= 0) OU->mizrakcilar.saglik = 0;
-    if (OU->varg_binicileri.saglik <= 0) OU->varg_binicileri.saglik = 0;
-    if (OU->troller.saglik <= 0) OU->troller.saglik = 0;
+    
+    if (OU->ork_dovusculeri.sayi <= 0) OU->ork_dovusculeri.sayi = 0;
+    if (OU->mizrakcilar.sayi <= 0) OU->mizrakcilar.sayi = 0;
+    if (OU->varg_binicileri.sayi <= 0) OU->varg_binicileri.sayi = 0;
+    if (OU->troller.sayi <= 0) OU->troller.sayi = 0;
 }
 
-int insan_net_hasar_hesaplama(Human_Unit *HU, int *toplam_insan_saldiri, int *toplam_insan_savunma, int *toplam_ork_savunma)
+void insan_saglik_hesapla(Human_Unit *HU, double net_hasar_ork, double *toplam_insan_savunma)
+{
+    //Oran hesaplama(insan)
+	double oran_piyadeler = (double)(HU->piyadeler.savunma * HU->piyadeler.sayi) / *toplam_insan_savunma;
+    double oran_okcular = (double)(HU->okcular.savunma * HU->okcular.sayi) / *toplam_insan_savunma;
+    double oran_suvariler = (double)(HU->suvariler.savunma * HU->suvariler.sayi) / *toplam_insan_savunma;
+    double oran_kusatma = (double)(HU->kusatma_makineleri.savunma * HU->kusatma_makineleri.sayi) / *toplam_insan_savunma;
+	
+    //Hasar Dagilimi(insan)
+	double hasar_piyadeler = net_hasar_ork * oran_piyadeler;
+    double hasar_okcular = net_hasar_ork * oran_okcular;
+    double hasar_suvariler = net_hasar_ork * oran_suvariler;
+    double hasar_kusatma = net_hasar_ork * oran_kusatma;
+
+	// Sayi Guncelleme(insan)
+    HU->piyadeler.sayi -= hasar_piyadeler / HU->piyadeler.saglik;
+    HU->okcular.sayi -= hasar_okcular / HU->okcular.saglik;
+    HU->suvariler.sayi -= hasar_suvariler / HU->suvariler.saglik;
+    HU->kusatma_makineleri.sayi -= hasar_kusatma / HU->kusatma_makineleri.saglik;
+
+    // sayi 0'in altina duserse, 0'da sabitle.(insan)
+    if (HU->piyadeler.sayi <= 0) HU->piyadeler.sayi = 0;
+    if (HU->okcular.sayi <= 0) HU->okcular.sayi = 0;
+    if (HU->suvariler.sayi<= 0) HU->suvariler.sayi = 0;
+    if (HU->kusatma_makineleri.sayi <= 0) HU->kusatma_makineleri.sayi = 0;
+
+}
+
+int insan_net_hasar_hesaplama(Human_Unit *HU, double *toplam_insan_saldiri, double *toplam_insan_savunma, double *toplam_ork_savunma)
 {
     int insan_net_hasar = *toplam_insan_saldiri * (1 - (*toplam_ork_savunma / *toplam_insan_saldiri));
     if (insan_net_hasar < 0)
@@ -910,7 +943,7 @@ int insan_net_hasar_hesaplama(Human_Unit *HU, int *toplam_insan_saldiri, int *to
     return (insan_net_hasar);
 }
 
-int ork_net_hasar_hesaplama(Ork_Unit *OU, int *toplam_ork_saldiri, int *toplam_ork_savunma, int *toplam_insan_savunma)
+int ork_net_hasar_hesaplama(Ork_Unit *OU, double *toplam_ork_saldiri, double *toplam_ork_savunma, double *toplam_insan_savunma)
 {
     int ork_net_hasar = *toplam_ork_saldiri * (1 - (*toplam_insan_savunma / *toplam_ork_saldiri));
     if (ork_net_hasar < 0)
@@ -937,7 +970,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
     
     if(HH->yss.sayi == 1)
     {
-        HU->suvariler.kritik_sans = 15;
+        HU->suvariler.kritik_sans += 15;
     }
     
     if(HH->tugrul_bey.sayi == 1)
@@ -957,7 +990,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
     
     if(OH->vrog.sayi == 1)
     {
-        OU->varg_binicileri.kritik_sans = 15;
+        OU->varg_binicileri.kritik_sans += 15;
     }
 
     if (OH->ugar.sayi == 1)
@@ -986,7 +1019,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
 
     if(HC->karakurt.sayi == 1)
     {
-        HU->okcular.kritik_sans = 10;
+        HU->okcular.kritik_sans += 10;
     }
 
     if(HC->samur.sayi == 1)
@@ -1072,10 +1105,26 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
 
     if(HR->elit_egitim.seviye_1.sayi)
     {
-        HU->piyadeler.kritik_sans = 5;
-        HU->okcular.kritik_sans = 5;
-        HU->suvariler.kritik_sans = 5;
-        HU->kusatma_makineleri.kritik_sans = 5;
+        HU->piyadeler.kritik_sans += 5;
+        HU->okcular.kritik_sans += 5;
+        HU->suvariler.kritik_sans += 5;
+        HU->kusatma_makineleri.kritik_sans += 5;
+    }
+
+    if(HR->elit_egitim.seviye_2.sayi)
+    {
+        HU->piyadeler.kritik_sans += 10;
+        HU->okcular.kritik_sans += 10;
+        HU->suvariler.kritik_sans += 10;
+        HU->kusatma_makineleri.kritik_sans += 10;
+    }
+
+    if(HR->elit_egitim.seviye_3.sayi)
+    {
+        HU->piyadeler.kritik_sans += 15;
+        HU->okcular.kritik_sans += 15;
+        HU->suvariler.kritik_sans += 15;
+        HU->kusatma_makineleri.kritik_sans += 15;
     }
 
     if(HR->kusatma_ustaligi.seviye_1.sayi == 1)
@@ -1141,29 +1190,87 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
 
     if(OR->elit_egitim.seviye_1.sayi)
     {
-        OU->ork_dovusculeri.kritik_sans = 5;
-        OU->mizrakcilar.kritik_sans = 5;
-        OU->varg_binicileri.kritik_sans = 5;
-        OU->troller.kritik_sans = 5;
+        OU->ork_dovusculeri.kritik_sans += 5;
+        OU->mizrakcilar.kritik_sans += 5;
+        OU->varg_binicileri.kritik_sans += 5;
+        OU->troller.kritik_sans += 5;
     }
 
     if(OR->elit_egitim.seviye_2.sayi == 1)
     {
-        OU->ork_dovusculeri.kritik_sans = 10;
-        OU->mizrakcilar.kritik_sans = 10;
-        OU->varg_binicileri.kritik_sans = 10;
-        OU->troller.kritik_sans = 10;
+        OU->ork_dovusculeri.kritik_sans += 10;
+        OU->mizrakcilar.kritik_sans += 10;
+        OU->varg_binicileri.kritik_sans += 10;
+        OU->troller.kritik_sans += 10;
     }
 
     if(OR->elit_egitim.seviye_3.sayi == 1)
     {
-        OU->ork_dovusculeri.kritik_sans = 15;
-        OU->mizrakcilar.kritik_sans = 15;
-        OU->varg_binicileri.kritik_sans = 15;
-        OU->troller.kritik_sans = 15;
+        OU->ork_dovusculeri.kritik_sans += 15;
+        OU->mizrakcilar.kritik_sans += 15;
+        OU->varg_binicileri.kritik_sans += 15;
+        OU->troller.kritik_sans += 15;
     }    
 }
 
+void savas_adim_adim(Human_Unit *HU, Ork_Unit *OU, int adim) {
+    printf("\nAdim %d:\n", adim);
+
+    double toplam_insan_saldiri = 0;
+    double toplam_ork_saldiri = 0;
+    double toplam_insan_savunma = 0;
+    double toplam_ork_savunma = 0;
+
+    // Saldiri ve savunma guclerini hesapla
+    saldiri_gucu_hesapla(HU, OU, adim, &toplam_insan_saldiri, &toplam_ork_saldiri);
+    savunma_gucu_hesapla(HU, OU, &toplam_insan_savunma, &toplam_ork_savunma);
+
+    // Insanlarin orklara verdigi net hasari hesapla
+    
+
+    // Orklarin insanlara verdigi net hasari hesapla
+    
+
+    if(adim % 2 == 0)
+    {
+        double net_hasar_ork = ork_net_hasar_hesaplama(OU, &toplam_ork_saldiri, &toplam_ork_savunma, &toplam_insan_savunma);
+        printf("Ork irki insan birimlerine %.2f hasar verdi.\n", net_hasar_ork);
+        insan_saglik_hesapla(HU, net_hasar_ork, &toplam_insan_savunma);
+        printf("Insan Piyadelerinin yeni sayisi: %d\n", HU->piyadeler.sayi);
+        printf("Insan Okcularinin yeni sayisi: %d\n", HU->okcular.sayi);
+        printf("Insan Suvarilerinin yeni sayisi: %d\n", HU->suvariler.sayi);
+        printf("Insan Kusatma Makinelerinin yeni sayisi: %d\n", HU->kusatma_makineleri.sayi);
+
+    }
+
+    if(adim % 2 == 1)
+    {
+        double net_hasar_insan = insan_net_hasar_hesaplama(HU, &toplam_insan_saldiri, &toplam_insan_savunma, &toplam_ork_savunma);
+        printf("Insan irki ork birimlerine %.2f hasar verdi.\n", net_hasar_insan);
+        ork_saglik_hesapla(OU, net_hasar_insan, &toplam_ork_savunma);
+        printf("Ork Dovusculerinin yeni sayisi: %d\n", OU->ork_dovusculeri.sayi);
+        printf("Ork Mizrakcilarinin yeni sayisi: %d\n", OU->mizrakcilar.sayi);
+        printf("Ork Varg Binicilerinin yeni sayisi: %d\n", OU->varg_binicileri.sayi);
+        printf("Ork Trollerinin yeni sayisi: %d\n\n", OU->troller.sayi);
+    }
+    
+    // Guncellenen sayi durumlarini yazdir
+
+
+    // Eger insan birimlerinin sayilari 0'a ulastiysa savasi bitir
+    if (HU->piyadeler.sayi <= 0 && HU->okcular.sayi <= 0 &&
+        HU->suvariler.sayi <= 0 && HU->kusatma_makineleri.sayi <= 0) {
+        printf("Ork irki kazandi!\n");
+        return;
+    }
+
+    // Eger ork birimlerinin sayilari 0'a ulastiysa savasi bitir
+    if (OU->ork_dovusculeri.sayi <= 0 && OU->mizrakcilar.sayi <= 0 &&
+        OU->varg_binicileri.sayi <= 0 && OU->troller.sayi <= 0) {
+        printf("Insan irki kazandi!\n\n");
+        return;
+    }
+}
 
 int main()
 {
@@ -1172,23 +1279,20 @@ int main()
     parse_creature_json("creatures.json", &HC, &OC);
     parse_research_json("research.json", &HR, &OR);
 
-    read_ork_scenario("1.json", &OU, &OH, &OC, &OR);
-    read_human_scenario("1.json", &HU, &HH, &HC, &HR);
-    int toplam_insan_saldiri = 0;
-    int toplam_insan_savunma = 0;
-    int toplam_ork_saldiri = 0;
-    int toplam_ork_savunma = 0;
+    read_ork_scenario("7.json", &OU, &OH, &OC, &OR);
+    read_human_scenario("7.json", &HU, &HH, &HC, &HR);
     add_bonus_value(&HU, &OU, &HH, &OH, &HC, &OC, &HR, &OR);
-    saldiri_gucu_hesapla(&HU, &OU, &toplam_insan_saldiri, &toplam_ork_saldiri);
-    savunma_gucu_hesapla(&HU, &OU, &toplam_insan_savunma, &toplam_ork_savunma);
+    
+    int adim = 1;
+   while (!((HU.piyadeler.sayi == 0 && HU.okcular.sayi == 0 && 
+           HU.suvariler.sayi == 0 && HU.kusatma_makineleri.sayi == 0) ||
+          (OU.ork_dovusculeri.sayi == 0 && OU.mizrakcilar.sayi == 0 && 
+           OU.varg_binicileri.sayi == 0 && OU.troller.sayi == 0))) {
+    savas_adim_adim(&HU, &OU, adim);
+    adim++;
+    
+     
+    }
 
-    int net_hasar_insan = insan_net_hasar_hesaplama(&HU, &toplam_insan_saldiri, &toplam_insan_savunma, &toplam_ork_savunma);
-    int net_hasar_ork = ork_net_hasar_hesaplama(&OU, &toplam_ork_saldiri, &toplam_ork_savunma, &toplam_insan_savunma);
-
-    saglik_hesapla(&HU, &OU, net_hasar_insan, net_hasar_ork, &toplam_insan_savunma, &toplam_ork_savunma);
-
-    yazdir_human_unit(&HU);
-    printf("\n\n");
-    yazdir_ork_unit(&OU);
     return 0;
 }
