@@ -62,6 +62,10 @@ void read_ork_scenario(const char *filename, Ork_Unit *OU, Ork_Hero *OH, Ork_Cre
                 {
                     OC->ates_iblisi.sayi++;
                 }
+                if (strstr(line, "\"Makrog_Savas_Beyi\"") != NULL)
+                {
+                    OC->makrog.sayi++;
+                }
                 if (strstr(line, "\"Buz_Devleri\"") != NULL)
                 {
                     OC->buz_devi.sayi++;
