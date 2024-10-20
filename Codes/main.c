@@ -1,6 +1,68 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include "include/curl/curl.h"
+
+const char* url_list[] =
+{
+    "https://yapbenzet.org.tr/1.json",
+    "https://yapbenzet.org.tr/2.json",
+    "https://yapbenzet.org.tr/3.json",
+    "https://yapbenzet.org.tr/4.json",
+    "https://yapbenzet.org.tr/5.json",
+    "https://bilgisayar.kocaeli.edu.tr/1.json",
+    "https://bilgisayar.kocaeli.edu.tr/2.json",
+    "https://bilgisayar.kocaeli.edu.tr/3.json",
+    "https://bilgisayar.kocaeli.edu.tr/4.json",
+    "https://bilgisayar.kocaeli.edu.tr/5.json"
+};
+
+size_t ft_write(void *ptr, size_t size, size_t nmemb, FILE *stream)
+{
+    return fwrite(ptr, size, nmemb, stream);
+}
+
+void dosya_indir(int num)
+{
+    CURL *curl;
+    FILE *file;
+    CURLcode res;
+
+    if (num < 1 || num > 10)
+	{
+        printf("Gecersiz Numara! 1-10 Arasinda Bir Numara Giriniz.\n");
+        return;
+    }
+    const char *url = url_list[num - 1];
+    printf("Secilen Senaryoya Ait URL: %s\n", url);
+
+    curl = curl_easy_init();
+    if (curl)
+	{
+        file = fopen("senaryo.json", "wb");
+        if (!file)
+		{
+            perror("Dosya Acilamadi!");
+            return;
+        }
+
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, ft_write);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);  // SSL sertifikasını doğrulamayı kapat
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+        res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK)
+		{
+            fprintf(stderr, "Dosya Indirilemedi: %s\n", curl_easy_strerror(res));
+        }
+
+        fclose(file);
+        curl_easy_cleanup(curl);
+
+    }
+}
 
 typedef struct {
     int saldiri;
@@ -1335,13 +1397,21 @@ void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adi
 
 int main()
 {
+
+    int num;
+    printf("1-10 arasi sayi seciniz.\n");
+    scanf("%d",&num);
+
+    dosya_indir(num);
+
     parse_unit_json("unit_types.json", &HU, &OU);
     parse_hero_json("heroes.json", &HH, &OH);
     parse_creature_json("creatures.json", &HC, &OC);
     parse_research_json("research.json", &HR, &OR);
 
-    read_ork_scenario("10.json", &OU, &OH, &OC, &OR);
-    read_human_scenario("10.json", &HU, &HH, &HC, &HR);
+    read_ork_scenario("senaryo.json", &OU, &OH, &OC, &OR);
+    read_human_scenario("senaryo.json", &HU, &HH, &HC, &HR);
+
     add_bonus_value(&HU, &OU, &HH, &OH, &HC, &OC, &HR, &OR);
 
 	FILE *file = fopen("savas_sim.txt", "w");
@@ -1351,14 +1421,16 @@ int main()
         return 0;
     }
 	fclose(file);
+
     int adim = 1;
     while (!((HU.piyadeler.sayi == 0 && HU.okcular.sayi == 0 &&
            HU.suvariler.sayi == 0 && HU.kusatma_makineleri.sayi == 0) ||
           (OU.ork_dovusculeri.sayi == 0 && OU.mizrakcilar.sayi == 0 &&
-           OU.varg_binicileri.sayi == 0 && OU.troller.sayi == 0)))
-		{
+           OU.varg_binicileri.sayi == 0 && OU.troller.sayi == 0))){
+
     		savas_adim_adim("savas_sim.txt", &HU, &OU, adim);
     		adim++;
-		}
+           }
+
     return 0;
 }
