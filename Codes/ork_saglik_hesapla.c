@@ -1,6 +1,6 @@
 void ork_saglik_hesapla(Ork_Unit *OU, double net_hasar_insan, double *toplam_ork_savunma)
 {
-   // Oran Hesaplama
+    // Oran Hesaplama
 
 
     double oran_ork_dovusculeri = (double)(OU->ork_dovusculeri.savunma * OU->ork_dovusculeri.sayi) / *toplam_ork_savunma;
@@ -23,7 +23,7 @@ void ork_saglik_hesapla(Ork_Unit *OU, double net_hasar_insan, double *toplam_ork
 
     // Sağlık 0'ın altına düşerse, 0'da sabitle.
 
-	if (OU->ork_dovusculeri.saglik <= 0) OU->ork_dovusculeri.saglik = 0;
+    if (OU->ork_dovusculeri.saglik <= 0) OU->ork_dovusculeri.saglik = 0;
     if (OU->mizrakcilar.saglik <= 0) OU->mizrakcilar.saglik = 0;
     if (OU->varg_binicileri.saglik <= 0) OU->varg_binicileri.saglik = 0;
     if (OU->troller.saglik <= 0) OU->troller.saglik = 0;
@@ -37,25 +37,25 @@ void ork_saglik_hesapla(Ork_Unit *OU, double net_hasar_insan, double *toplam_ork
 void insan_saglik_hesapla(Human_Unit *HU, double net_hasar_ork, double *toplam_insan_savunma)
 {
     //Oran hesaplama(insan)
-	double oran_piyadeler = (double)(HU->piyadeler.savunma * HU->piyadeler.sayi) / *toplam_insan_savunma;
+    double oran_piyadeler = (double)(HU->piyadeler.savunma * HU->piyadeler.sayi) / *toplam_insan_savunma;
     double oran_okcular = (double)(HU->okcular.savunma * HU->okcular.sayi) / *toplam_insan_savunma;
     double oran_suvariler = (double)(HU->suvariler.savunma * HU->suvariler.sayi) / *toplam_insan_savunma;
     double oran_kusatma = (double)(HU->kusatma_makineleri.savunma * HU->kusatma_makineleri.sayi) / *toplam_insan_savunma;
 
     //Hasar Dagilimi(insan)
-	double hasar_piyadeler = net_hasar_ork * oran_piyadeler;
+    double hasar_piyadeler = net_hasar_ork * oran_piyadeler;
     double hasar_okcular = net_hasar_ork * oran_okcular;
     double hasar_suvariler = net_hasar_ork * oran_suvariler;
     double hasar_kusatma = net_hasar_ork * oran_kusatma;
 
-	// Sayi Guncelleme(insan)
+    // Sayi Guncelleme(insan)
     HU->piyadeler.saglik -= hasar_piyadeler / HU->piyadeler.saglik;
     HU->okcular.saglik -= hasar_okcular / HU->okcular.saglik;
     HU->suvariler.saglik -= hasar_suvariler / HU->suvariler.saglik;
     HU->kusatma_makineleri.saglik -= hasar_kusatma / HU->kusatma_makineleri.saglik;
 
     // sayi 0'in altina duserse, 0'da sabitle.(insan)
-	if (HU->piyadeler.saglik <= 0) HU->piyadeler.saglik = 0;
+    if (HU->piyadeler.saglik <= 0) HU->piyadeler.saglik = 0;
     if (HU->okcular.saglik <= 0) HU->okcular.saglik = 0;
     if (HU->suvariler.saglik<= 0) HU->suvariler.saglik = 0;
     if (HU->kusatma_makineleri.saglik <= 0) HU->kusatma_makineleri.saglik = 0;

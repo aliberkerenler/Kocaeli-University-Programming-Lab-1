@@ -1,7 +1,7 @@
 void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adim)
 {
-	FILE *file = fopen(filename, "a");
-	if (file == NULL)
+    FILE *file = fopen(filename, "a");
+    if (file == NULL)
     {
         printf("Dosya Acilamadi: %s\n", filename);
         return;
@@ -70,17 +70,19 @@ void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adi
 
     // Eger insan birimlerinin sayilari 0'a ulastiysa savasi bitir
     if (HU->piyadeler.sayi <= 0 && HU->okcular.sayi <= 0 &&
-        HU->suvariler.sayi <= 0 && HU->kusatma_makineleri.sayi <= 0) {
+            HU->suvariler.sayi <= 0 && HU->kusatma_makineleri.sayi <= 0)
+    {
         fprintf(file, "Ork irki kazandi!\n");
         return;
     }
 
     // Eger ork birimlerinin sayilari 0'a ulastiysa savasi bitir
     if (OU->ork_dovusculeri.sayi <= 0 && OU->mizrakcilar.sayi <= 0 &&
-        OU->varg_binicileri.sayi <= 0 && OU->troller.sayi <= 0) {
+            OU->varg_binicileri.sayi <= 0 && OU->troller.sayi <= 0)
+    {
         fprintf(file, "Insan irki kazandi!\n\n");
         return;
     }
 
-	fclose(file);
+    fclose(file);
 }

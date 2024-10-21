@@ -28,7 +28,7 @@ void dosya_indir(int num)
     CURLcode res;
 
     if (num < 1 || num > 10)
-	{
+    {
         printf("Gecersiz Numara! 1-10 Arasinda Bir Numara Giriniz.\n");
         return;
     }
@@ -37,10 +37,10 @@ void dosya_indir(int num)
 
     curl = curl_easy_init();
     if (curl)
-	{
+    {
         file = fopen("senaryo.json", "wb");
         if (!file)
-		{
+        {
             perror("Dosya Acilamadi!");
             return;
         }
@@ -54,7 +54,7 @@ void dosya_indir(int num)
         res = curl_easy_perform(curl);
 
         if (res != CURLE_OK)
-		{
+        {
             fprintf(stderr, "Dosya Indirilemedi: %s\n", curl_easy_strerror(res));
         }
 
@@ -64,7 +64,8 @@ void dosya_indir(int num)
     }
 }
 
-typedef struct {
+typedef struct
+{
     int saldiri;
     int savunma;
     int saglik;
@@ -72,28 +73,32 @@ typedef struct {
     int sayi;
 } Unit;
 
-typedef struct {
+typedef struct
+{
     Unit piyadeler;
     Unit okcular;
     Unit suvariler;
     Unit kusatma_makineleri;
 } Human_Unit;
 
-typedef struct {
+typedef struct
+{
     Unit ork_dovusculeri;
     Unit mizrakcilar;
     Unit varg_binicileri;
     Unit troller;
 } Ork_Unit;
 
-typedef struct {
+typedef struct
+{
     char bonus_turu[50];
     char aciklama[256];
     int bonus_degeri;
     int sayi;
 } Hero;
 
-typedef struct {
+typedef struct
+{
     Hero alparslan;
     Hero fsm;
     Hero metehan;
@@ -101,21 +106,24 @@ typedef struct {
     Hero tugrul_bey;
 } Human_Hero;
 
-typedef struct {
+typedef struct
+{
     Hero goruk;
     Hero thruk;
     Hero vrog;
     Hero ugar;
 } Ork_Hero;
 
-typedef struct {
+typedef struct
+{
     int etki_degeri;
     char etki_turu[50];
     char aciklama[256];
     int sayi;
 } Creature;
 
-typedef struct {
+typedef struct
+{
     Creature ejderha;
     Creature agri_dagi;
     Creature tepegoz;
@@ -123,7 +131,8 @@ typedef struct {
     Creature samur;
 } Human_Creature;
 
-typedef struct {
+typedef struct
+{
     Creature troll;
     Creature golge;
     Creature camur;
@@ -132,19 +141,22 @@ typedef struct {
     Creature buz_devi;
 } Ork_Creature;
 
-typedef struct {
+typedef struct
+{
     int deger;
     char aciklama[100];
     int sayi;
 } Seviye;
 
-typedef struct {
+typedef struct
+{
     Seviye seviye_1;
     Seviye seviye_2;
     Seviye seviye_3;
 } Research_Type;
 
-typedef struct {
+typedef struct
+{
     Research_Type savunma_ustaligi;
     Research_Type saldiri_gelistirmesi;
     Research_Type elit_egitim;
@@ -299,26 +311,28 @@ void parse_creature_json(const char *filename, Human_Creature *HC, Ork_Creature 
     fclose(file);
 }
 
-void yazdir_human_unit(Human_Unit *hu) {
+void yazdir_human_unit(Human_Unit *hu)
+{
     printf("Piyadeler - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
-            hu->piyadeler.saldiri, hu->piyadeler.savunma, hu->piyadeler.saglik, hu->piyadeler.kritik_sans, hu->piyadeler.sayi);
+           hu->piyadeler.saldiri, hu->piyadeler.savunma, hu->piyadeler.saglik, hu->piyadeler.kritik_sans, hu->piyadeler.sayi);
     printf("Okçular - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
-            hu->okcular.saldiri, hu->okcular.savunma, hu->okcular.saglik, hu->okcular.kritik_sans, hu->okcular.sayi);
+           hu->okcular.saldiri, hu->okcular.savunma, hu->okcular.saglik, hu->okcular.kritik_sans, hu->okcular.sayi);
     printf("Süvariler - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
-            hu->suvariler.saldiri, hu->suvariler.savunma, hu->suvariler.saglik, hu->suvariler.kritik_sans, hu->suvariler.sayi);
+           hu->suvariler.saldiri, hu->suvariler.savunma, hu->suvariler.saglik, hu->suvariler.kritik_sans, hu->suvariler.sayi);
     printf("Kuşatma Makineleri - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
-            hu->kusatma_makineleri.saldiri, hu->kusatma_makineleri.savunma, hu->kusatma_makineleri.saglik, hu->kusatma_makineleri.kritik_sans, hu->kusatma_makineleri.sayi);
+           hu->kusatma_makineleri.saldiri, hu->kusatma_makineleri.savunma, hu->kusatma_makineleri.saglik, hu->kusatma_makineleri.kritik_sans, hu->kusatma_makineleri.sayi);
 }
 
-void yazdir_ork_unit(Ork_Unit *ou) {
+void yazdir_ork_unit(Ork_Unit *ou)
+{
     printf("Ork Dövüşçüleri - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
-            ou->ork_dovusculeri.saldiri, ou->ork_dovusculeri.savunma, ou->ork_dovusculeri.saglik, ou->ork_dovusculeri.kritik_sans, ou->ork_dovusculeri.sayi);
+           ou->ork_dovusculeri.saldiri, ou->ork_dovusculeri.savunma, ou->ork_dovusculeri.saglik, ou->ork_dovusculeri.kritik_sans, ou->ork_dovusculeri.sayi);
     printf("Mizrakcilar - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
-            ou->mizrakcilar.saldiri, ou->mizrakcilar.savunma, ou->mizrakcilar.saglik, ou->mizrakcilar.kritik_sans, ou->mizrakcilar.sayi);
+           ou->mizrakcilar.saldiri, ou->mizrakcilar.savunma, ou->mizrakcilar.saglik, ou->mizrakcilar.kritik_sans, ou->mizrakcilar.sayi);
     printf("Varg Binicileri - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
-            ou->varg_binicileri.saldiri, ou->varg_binicileri.savunma, ou->varg_binicileri.saglik, ou->varg_binicileri.kritik_sans, ou->varg_binicileri.sayi);
+           ou->varg_binicileri.saldiri, ou->varg_binicileri.savunma, ou->varg_binicileri.saglik, ou->varg_binicileri.kritik_sans, ou->varg_binicileri.sayi);
     printf("Troller - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
-            ou->troller.saldiri, ou->troller.savunma, ou->troller.saglik, ou->troller.kritik_sans, ou->troller.sayi);
+           ou->troller.saldiri, ou->troller.savunma, ou->troller.saglik, ou->troller.kritik_sans, ou->troller.sayi);
 }
 
 void parse_hero_json(const char *filename, Human_Hero *HH, Ork_Hero *OH)
@@ -907,23 +921,24 @@ int kritik_vurus_hesapla(Unit *unit, int adim)
 }
 
 // İnsanların toplam saldırı gücünü hesaplayan fonksiyon
-void saldiri_gucu_hesapla(Human_Unit *HU, Ork_Unit *OU , int adim , double *toplam_insan_saldiri , double *toplam_ork_saldiri)
+void saldiri_gucu_hesapla(Human_Unit *HU, Ork_Unit *OU, int adim, double *toplam_insan_saldiri, double *toplam_ork_saldiri)
 {
-    *toplam_insan_saldiri = kritik_vurus_hesapla(&HU->piyadeler , adim) +
-                            kritik_vurus_hesapla(&HU->okcular , adim) +
-                            kritik_vurus_hesapla(&HU->suvariler , adim) +
-                            kritik_vurus_hesapla(&HU->kusatma_makineleri , adim) ;
+    *toplam_insan_saldiri = kritik_vurus_hesapla(&HU->piyadeler, adim) +
+                            kritik_vurus_hesapla(&HU->okcular, adim) +
+                            kritik_vurus_hesapla(&HU->suvariler, adim) +
+                            kritik_vurus_hesapla(&HU->kusatma_makineleri, adim) ;
 
 
-    *toplam_ork_saldiri =   kritik_vurus_hesapla(&OU->ork_dovusculeri , adim) +
-                            kritik_vurus_hesapla(&OU->mizrakcilar , adim) +
-                            kritik_vurus_hesapla(&OU->varg_binicileri , adim) +
-                            kritik_vurus_hesapla(&OU->troller , adim);
+    *toplam_ork_saldiri =   kritik_vurus_hesapla(&OU->ork_dovusculeri, adim) +
+                            kritik_vurus_hesapla(&OU->mizrakcilar, adim) +
+                            kritik_vurus_hesapla(&OU->varg_binicileri, adim) +
+                            kritik_vurus_hesapla(&OU->troller, adim);
 
 }
 
 //SAvunma gucu hesaplayan Fonksiyon
-void savunma_gucu_hesapla(Human_Unit *HU , Ork_Unit *OU ,double *toplam_insan_savunma , double *toplam_ork_savunma) {
+void savunma_gucu_hesapla(Human_Unit *HU, Ork_Unit *OU,double *toplam_insan_savunma, double *toplam_ork_savunma)
+{
 
     *toplam_insan_savunma = (HU->piyadeler.savunma * HU->piyadeler.sayi) +
                             (HU->okcular.savunma * HU->okcular.sayi) +
@@ -939,7 +954,7 @@ void savunma_gucu_hesapla(Human_Unit *HU , Ork_Unit *OU ,double *toplam_insan_sa
 
 void ork_saglik_hesapla(Ork_Unit *OU, double net_hasar_insan, double *toplam_ork_savunma)
 {
-   // Oran Hesaplama
+    // Oran Hesaplama
 
 
     double oran_ork_dovusculeri = (double)(OU->ork_dovusculeri.savunma * OU->ork_dovusculeri.sayi) / *toplam_ork_savunma;
@@ -962,7 +977,7 @@ void ork_saglik_hesapla(Ork_Unit *OU, double net_hasar_insan, double *toplam_ork
 
     // Sağlık 0'ın altına düşerse, 0'da sabitle.
 
-	if (OU->ork_dovusculeri.saglik <= 0) OU->ork_dovusculeri.saglik = 0;
+    if (OU->ork_dovusculeri.saglik <= 0) OU->ork_dovusculeri.saglik = 0;
     if (OU->mizrakcilar.saglik <= 0) OU->mizrakcilar.saglik = 0;
     if (OU->varg_binicileri.saglik <= 0) OU->varg_binicileri.saglik = 0;
     if (OU->troller.saglik <= 0) OU->troller.saglik = 0;
@@ -976,25 +991,25 @@ void ork_saglik_hesapla(Ork_Unit *OU, double net_hasar_insan, double *toplam_ork
 void insan_saglik_hesapla(Human_Unit *HU, double net_hasar_ork, double *toplam_insan_savunma)
 {
     //Oran hesaplama(insan)
-	double oran_piyadeler = (double)(HU->piyadeler.savunma * HU->piyadeler.sayi) / *toplam_insan_savunma;
+    double oran_piyadeler = (double)(HU->piyadeler.savunma * HU->piyadeler.sayi) / *toplam_insan_savunma;
     double oran_okcular = (double)(HU->okcular.savunma * HU->okcular.sayi) / *toplam_insan_savunma;
     double oran_suvariler = (double)(HU->suvariler.savunma * HU->suvariler.sayi) / *toplam_insan_savunma;
     double oran_kusatma = (double)(HU->kusatma_makineleri.savunma * HU->kusatma_makineleri.sayi) / *toplam_insan_savunma;
 
     //Hasar Dagilimi(insan)
-	double hasar_piyadeler = net_hasar_ork * oran_piyadeler;
+    double hasar_piyadeler = net_hasar_ork * oran_piyadeler;
     double hasar_okcular = net_hasar_ork * oran_okcular;
     double hasar_suvariler = net_hasar_ork * oran_suvariler;
     double hasar_kusatma = net_hasar_ork * oran_kusatma;
 
-	// Sayi Guncelleme(insan)
+    // Sayi Guncelleme(insan)
     HU->piyadeler.saglik -= hasar_piyadeler / HU->piyadeler.saglik;
     HU->okcular.saglik -= hasar_okcular / HU->okcular.saglik;
     HU->suvariler.saglik -= hasar_suvariler / HU->suvariler.saglik;
     HU->kusatma_makineleri.saglik -= hasar_kusatma / HU->kusatma_makineleri.saglik;
 
     // sayi 0'in altina duserse, 0'da sabitle.(insan)
-	if (HU->piyadeler.saglik <= 0) HU->piyadeler.saglik = 0;
+    if (HU->piyadeler.saglik <= 0) HU->piyadeler.saglik = 0;
     if (HU->okcular.saglik <= 0) HU->okcular.saglik = 0;
     if (HU->suvariler.saglik<= 0) HU->suvariler.saglik = 0;
     if (HU->kusatma_makineleri.saglik <= 0) HU->kusatma_makineleri.saglik = 0;
@@ -1024,7 +1039,7 @@ int ork_net_hasar_hesaplama(Ork_Unit *OU, double *toplam_ork_saldiri, double *to
 
 void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH, Human_Creature *HC, Ork_Creature *OC, Research *HR, Research *OR)
 {
-	if (HH->alparslan.sayi == 1)
+    if (HH->alparslan.sayi == 1)
     {
         HU->piyadeler.savunma *= 1.2;
     }
@@ -1200,17 +1215,17 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
 
     if(HR->kusatma_ustaligi.seviye_1.sayi == 1)
     {
-       HU->kusatma_makineleri.saldiri *= 1.1;
+        HU->kusatma_makineleri.saldiri *= 1.1;
     }
 
     if(HR->kusatma_ustaligi.seviye_2.sayi == 1)
     {
-       HU->kusatma_makineleri.saldiri *= 1.2;
+        HU->kusatma_makineleri.saldiri *= 1.2;
     }
 
     if(HR->kusatma_ustaligi.seviye_3.sayi == 1)
     {
-       HU->kusatma_makineleri.saldiri *= 1.3;
+        HU->kusatma_makineleri.saldiri *= 1.3;
     }
 
     if (OR->savunma_ustaligi.seviye_1.sayi == 1)
@@ -1286,8 +1301,8 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
 
 void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adim)
 {
-	FILE *file = fopen(filename, "a");
-	if (file == NULL)
+    FILE *file = fopen(filename, "a");
+    if (file == NULL)
     {
         printf("Dosya Acilamadi: %s\n", filename);
         return;
@@ -1356,19 +1371,21 @@ void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adi
 
     // Eger insan birimlerinin sayilari 0'a ulastiysa savasi bitir
     if (HU->piyadeler.sayi <= 0 && HU->okcular.sayi <= 0 &&
-        HU->suvariler.sayi <= 0 && HU->kusatma_makineleri.sayi <= 0) {
+            HU->suvariler.sayi <= 0 && HU->kusatma_makineleri.sayi <= 0)
+    {
         fprintf(file, "Ork irki kazandi!\n");
         return;
     }
 
     // Eger ork birimlerinin sayilari 0'a ulastiysa savasi bitir
     if (OU->ork_dovusculeri.sayi <= 0 && OU->mizrakcilar.sayi <= 0 &&
-        OU->varg_binicileri.sayi <= 0 && OU->troller.sayi <= 0) {
+            OU->varg_binicileri.sayi <= 0 && OU->troller.sayi <= 0)
+    {
         fprintf(file, "Insan irki kazandi!\n\n");
         return;
     }
 
-	fclose(file);
+    fclose(file);
 }
 
 int main()
@@ -1382,21 +1399,21 @@ int main()
     read_human_scenario("10.json", &HU, &HH, &HC, &HR);
     add_bonus_value(&HU, &OU, &HH, &OH, &HC, &OC, &HR, &OR);
 
-	FILE *file = fopen("savas_sim.txt", "w");
-	if (file == NULL)
+    FILE *file = fopen("savas_sim.txt", "w");
+    if (file == NULL)
     {
         printf("Dosya Acilamadi: %s\n", "savas_sim.txt");
         return 0;
     }
-	fclose(file);
+    fclose(file);
     int adim = 1;
     while (!((HU.piyadeler.sayi == 0 && HU.okcular.sayi == 0 &&
-           HU.suvariler.sayi == 0 && HU.kusatma_makineleri.sayi == 0) ||
-          (OU.ork_dovusculeri.sayi == 0 && OU.mizrakcilar.sayi == 0 &&
-           OU.varg_binicileri.sayi == 0 && OU.troller.sayi == 0)))
-		{
-    		savas_adim_adim("savas_sim.txt", &HU, &OU, adim);
-    		adim++;
-		}
+              HU.suvariler.sayi == 0 && HU.kusatma_makineleri.sayi == 0) ||
+             (OU.ork_dovusculeri.sayi == 0 && OU.mizrakcilar.sayi == 0 &&
+              OU.varg_binicileri.sayi == 0 && OU.troller.sayi == 0)))
+    {
+        savas_adim_adim("savas_sim.txt", &HU, &OU, adim);
+        adim++;
+    }
     return 0;
 }
