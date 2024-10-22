@@ -1399,8 +1399,8 @@ int main()
     printf("1-10 Arasi Bir Senaryo Numarasi Seciniz: ");
     scanf("%d",&num);
     dosya_indir(num);
-    read_ork_scenario("10.json", &OU, &OH, &OC, &OR);
-    read_human_scenario("10.json", &HU, &HH, &HC, &HR);
+    read_ork_scenario("senaryo.json", &OU, &OH, &OC, &OR);
+    read_human_scenario("senaryo.json", &HU, &HH, &HC, &HR);
     add_bonus_value(&HU, &OU, &HH, &OH, &HC, &OC, &HR, &OR);
 
     FILE *file = fopen("savas_sim.txt", "w");
