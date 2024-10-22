@@ -1390,11 +1390,15 @@ void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adi
 
 int main()
 {
+    int num;
     parse_unit_json("unit_types.json", &HU, &OU);
     parse_hero_json("heroes.json", &HH, &OH);
     parse_creature_json("creatures.json", &HC, &OC);
     parse_research_json("research.json", &HR, &OR);
 
+    printf("1-10 Arasi Bir Senaryo Numarasi Seciniz: ");
+    scanf("%d",&num);
+    dosya_indir(num);
     read_ork_scenario("10.json", &OU, &OH, &OC, &OR);
     read_human_scenario("10.json", &HU, &HH, &HC, &HR);
     add_bonus_value(&HU, &OU, &HH, &OH, &HC, &OC, &HR, &OR);
