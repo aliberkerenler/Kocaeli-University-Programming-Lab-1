@@ -167,21 +167,6 @@ Research_Type RT;
 Research HR;
 Research OR;
 
-// Diğer tanımlar ve yapıların önceden tanımlandığını varsayıyoruz...
-
-// PNG resimlerini tanımlama
-Texture2D piyadeTexture;
-Texture2D okcuTexture;
-Texture2D suvariTexture;
-Texture2D kusatmaMakinesiTexture;
-Texture2D orkDovuscuTexture;
-Texture2D mizrakciTexture;
-Texture2D vargBinicisiTexture;
-Texture2D trolTexture;
-
-
-
-
 
 // Sağlık barı çizimi fonksiyonu
 // Sağlık çubuğunu çizme fonksiyonu (şeffaflık eklendi)
