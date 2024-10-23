@@ -1098,10 +1098,10 @@ void insan_saglik_hesapla(Human_Unit *HU, double net_hasar_ork, double *toplam_i
     double hasar_kusatma = net_hasar_ork * oran_kusatma;
 
     // Sayi Guncelleme(insan)
-    HU->piyadeler.saglik -= hasar_piyadeler / HU->piyadeler.saglik;
-    HU->okcular.saglik -= hasar_okcular / HU->okcular.saglik;
-    HU->suvariler.saglik -= hasar_suvariler / HU->suvariler.saglik;
-    HU->kusatma_makineleri.saglik -= hasar_kusatma / HU->kusatma_makineleri.saglik;
+    HU->piyadeler.saglik -= hasar_piyadeler / HU->piyadeler.sayi;
+    HU->okcular.saglik -= hasar_okcular / HU->okcular.sayi;
+    HU->suvariler.saglik -= hasar_suvariler / HU->suvariler.sayi;
+    HU->kusatma_makineleri.saglik -= hasar_kusatma / HU->kusatma_makineleri.sayi;
 
     // sayi 0'in altina duserse, 0'da sabitle.(insan)
     if (HU->piyadeler.saglik <= 0) HU->piyadeler.saglik = 0;
