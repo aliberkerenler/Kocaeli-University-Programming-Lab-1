@@ -307,7 +307,7 @@ void parse_creature_json(const char *filename, Human_Creature *HC, Ork_Creature 
     fclose(file);
 }
 
-void yazdir_human_unit(const char filename, Human_Unit *hu, Human_Creature *hc, Human_Hero *hh, Research *hr) {
+void yazdir_human_unit(const char filename, Human_Unit *hu, Human_Creature *HC, Human_Hero *HH, Research *HR) {
     FILE *file = fopen(filename, "a");
     if (file == NULL)
     {
@@ -442,7 +442,7 @@ void yazdir_human_unit(const char filename, Human_Unit *hu, Human_Creature *hc, 
     fclose(file);
 }
 
-void yazdir_ork_unit(const char filename, Ork_Unit *ou, Ork_Creature *oc, Ork_Hero *hh, Research *or) {
+void yazdir_ork_unit(const char filename, Ork_Unit *ou, Ork_Creature *OC, Ork_Hero *OH, Research *OR) {
     FILE *file = fopen(filename, "a");
     if (file == NULL)
     {
