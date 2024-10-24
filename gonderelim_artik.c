@@ -1665,7 +1665,7 @@ void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adi
     {
         fprintf(file, "\nAdim %d: Ork_Legi'nin Saldirisi\n", adim);
         
-        fprintf(file, "1. Saldiri Gucu Hesaplama (Bonuslar Dahil):\n");
+        fprintf(file, "Saldiri Gucu Hesaplama (Bonuslar Dahil):\n");
         
         fprintf(file, "Ork Dovusculeri: %d Birim x %d Saldiri Gucu\nMizrakcilar: %d Birim x %d Saldiri Gucu\nVarg Binicileri: %d Birim x %d Saldiri Gucu\nTroller: %d Birim x %d Saldiri Gucu\n", 
                 OU.ork_dovusculeri.sayi, OU.ork_dovusculeri.saldiri, OU.mizrakcilar.sayi, OU.mizrakcilar.saldiri, OU.varg_binicileri.sayi, OU.varg_binicileri.saldiri, OU.troller.sayi, OU.troller.saldiri);
@@ -1676,7 +1676,7 @@ void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adi
         
         double net_hasar_ork = ork_net_hasar_hesaplama(OU, &toplam_ork_saldiri, &toplam_insan_savunma);
         
-        fprintf(file, "Ork irki insan birimlerine %.2f hasar verdi.\n", net_hasar_ork);
+        fprintf(file, "Ork irki insan birimlerine %.2f net hasar verdi.\n", net_hasar_ork);
         
         insan_saglik_hesapla(HU, net_hasar_ork, &toplam_insan_savunma);
         
@@ -1692,7 +1692,7 @@ void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adi
     {
         fprintf(file, "\nAdim %d: Insan_Imparatorlugu'nun Saldirisi\n", adim);
         
-        fprintf(file, "1. Saldiri Gucu Hesaplama (Bonuslar Dahil):\n");
+        fprintf(file, "Saldiri Gucu Hesaplama (Bonuslar Dahil):\n");
         
         fprintf(file, "Piyadeler: %d Birim x %d Saldiri Gucu\nOkcular: %d Birim x %d Saldiri Gucu\nSuvariler: %d Birim x %d Saldiri Gucu\nKusatma Makineleri: %d Birim x %d Saldiri Gucu\n", 
                 HU.piyadeler.sayi, HU.piyadeler.saldiri, HU.okcular.sayi, HU.okcular.saldiri, HU.suvariler.sayi, HU.suvariler.saldiri, HU.kusatma_makineleri.sayi, HU.kusatma_makineleri.saldiri);
