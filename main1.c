@@ -995,10 +995,10 @@ void insan_saglik_hesapla(Human_Unit *HU, double net_hasar_ork, double *toplam_i
     double hasar_kusatma = net_hasar_ork * oran_kusatma;
 
     // Sayi Guncelleme(insan)
-    HU->piyadeler.saglik -= hasar_piyadeler / HU->piyadeler.saglik;
-    HU->okcular.saglik -= hasar_okcular / HU->okcular.saglik;
-    HU->suvariler.saglik -= hasar_suvariler / HU->suvariler.saglik;
-    HU->kusatma_makineleri.saglik -= hasar_kusatma / HU->kusatma_makineleri.saglik;
+    HU->piyadeler.saglik -= hasar_piyadeler / HU->piyadeler.sayi;
+    HU->okcular.saglik -= hasar_okcular / HU->okcular.sayi;
+    HU->suvariler.saglik -= hasar_suvariler / HU->suvariler.sayi;
+    HU->kusatma_makineleri.saglik -= hasar_kusatma / HU->kusatma_makineleri.sayi;
 
     // sayi 0'in altina duserse, 0'da sabitle.(insan)
     if (HU->piyadeler.saglik <= 0) HU->piyadeler.saglik = 0;
@@ -1242,7 +1242,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
         OU->troller.savunma *= 1.3;
     }
 
-    if(HR->saldiri_gelistirmesi.seviye_1.sayi == 1)
+    if(OR->saldiri_gelistirmesi.seviye_1.sayi == 1)
     {
         OU->ork_dovusculeri.saldiri *=1.1;
         OU->mizrakcilar.saldiri *=1.1;
@@ -1250,7 +1250,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
         OU->troller.saldiri *= 1.1;
     }
 
-    if(HR->saldiri_gelistirmesi.seviye_2.sayi == 1)
+    if(OR->saldiri_gelistirmesi.seviye_2.sayi == 1)
     {
         OU->ork_dovusculeri.saldiri *=1.2;
         OU->mizrakcilar.saldiri *=1.2;
@@ -1258,7 +1258,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
         OU->troller.saldiri *= 1.1;
     }
 
-    if(HR->saldiri_gelistirmesi.seviye_3.sayi == 1)
+    if(OR->saldiri_gelistirmesi.seviye_3.sayi == 1)
     {
         OU->ork_dovusculeri.saldiri *=1.3;
         OU->mizrakcilar.saldiri *=1.3;
@@ -1294,14 +1294,14 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
 
 
 // Saglik bari cizdirme
-void DrawHealthBar(int x, int y, int health) {
-    int barWidth = 40;
-    int barHeight = 5;
-    Color barColor = (health > 50) ? (Color){0, 255, 0, 180} :
+void BarCizimi(int x, int y, int health) {
+    int barKalinlik = 40;
+    int barUzunluk = 5;
+    Color barRengi = (health > 50) ? (Color){0, 255, 0, 180} :
                      (health > 20) ? (Color){255, 255, 0, 180} :
                      (Color){255, 0, 0, 180};
 
-    DrawRectangle(x - barWidth / 2, y - 15, barWidth * health / 100, barHeight, barColor);
+    DrawRectangle(x - barKalinlik / 2, y - 15, barKalinlik * health / 100, barUzunluk, barRengi);
     DrawText(TextFormat("%d", health), x + 5, y - 20, 10, BLACK); // Can degerini goster
 }
 
@@ -1311,33 +1311,33 @@ const char* kazananMesaj = NULL; // Kazananı saklayacak global değişken
 const char* KazananTespit(Human_Unit *HU, Ork_Unit *OU) {
 
     //insan toplam saglik
-    int humanTotalHealth = HU->piyadeler.saglik + HU->okcular.saglik + HU->suvariler.saglik + HU->kusatma_makineleri.saglik;
+    int insanSaglik = HU->piyadeler.saglik + HU->okcular.saglik + HU->suvariler.saglik + HU->kusatma_makineleri.saglik;
 
     // ork toplam saglik
-    int orkTotalHealth = OU->ork_dovusculeri.saglik + OU->mizrakcilar.saglik + OU->varg_binicileri.saglik + OU->troller.saglik;
+    int orkSaglik = OU->ork_dovusculeri.saglik + OU->mizrakcilar.saglik + OU->varg_binicileri.saglik + OU->troller.saglik;
 
     // Kazananı belirleme
-    if (humanTotalHealth <= 0 && orkTotalHealth > 0) {
+    if (insanSaglik <= 0 && orkSaglik > 0) {
         return "Orklar Kazandi!";
-    } else if (orkTotalHealth <= 0 && humanTotalHealth > 0) {
+    } else if (orkSaglik <= 0 && insanSaglik > 0) {
         return "Insanlar Kazandi!";
-    } else if (humanTotalHealth <= 0 && orkTotalHealth <= 0) {
+    } else if (insanSaglik <= 0 && orkSaglik <= 0) {
         return "Berabere!";
     } else {
         return NULL; // Savaş hala devam ediyor
     }
 }
 
-// Ana oyun döngüsünde tuş olaylarını kontrol etme
-void UpdateGame(Human_Unit *HU, Ork_Unit *OU) {
-    // Eğer kazanan belirlenmemişse, space tuşuna basıldığında kazananı belirle
+
+void SavasGuncelle(Human_Unit *HU, Ork_Unit *OU) {
+
     if (IsKeyPressed(KEY_SPACE) && kazananMesaj == NULL) {
         kazananMesaj = KazananTespit(HU, OU);
     }
 }
 // Birim simgelerini çizme fonksiyonu
-void DrawUnit(int x, int y, Unit unit, Color color, const char* unitName) {
-    DrawHealthBar(x, y, unit.saglik);
+void BirimCizme(int x, int y, Unit unit, Color color, const char* unitName) {
+    BarCizimi(x, y, unit.saglik);
     DrawCircle(x, y, 10, color);
     DrawText(unitName, x - 20, y + 15, 10, BLACK); // Birim ismini hafif aşağı kaydırdık
 }
@@ -1356,7 +1356,7 @@ void PlaceUnitsOnGrid(int startX, int startY, Unit unit, Color color, const char
         int centerY = cellY + CELL_SIZE / 2;
 
         // Birimi ciz
-        DrawUnit(centerX, centerY, unit, color, unitName);
+        BirimCizme(centerX, centerY, unit, color, unitName);
 
         char countText[4];
         sprintf(countText, "%d", unitsInThisCell);
@@ -1368,15 +1368,15 @@ void PlaceUnitsOnGrid(int startX, int startY, Unit unit, Color color, const char
 }
 
 // Izgara çizimi ve birimlerin yerleştirilmesi
-void DrawBattleGrid(Human_Unit *HU, Ork_Unit *OU) {
+void SavasAlaniCiz(Human_Unit *HU, Ork_Unit *OU) {
     int gridOffsetX = 50;
     int gridOffsetY = 50;
-    Color gridColor = (Color){200, 200, 200, 255};
+
 
     // Izgara çizimi
     for (int i = 0; i <= GRID_SIZE; i++) {
-        DrawLine(gridOffsetX, gridOffsetY + i * CELL_SIZE, gridOffsetX + GRID_SIZE * CELL_SIZE, gridOffsetY + i * CELL_SIZE, gridColor);
-        DrawLine(gridOffsetX + i * CELL_SIZE, gridOffsetY, gridOffsetX + i * CELL_SIZE, gridOffsetY + GRID_SIZE * CELL_SIZE, gridColor);
+        DrawLine(gridOffsetX, gridOffsetY + i * CELL_SIZE, gridOffsetX + GRID_SIZE * CELL_SIZE, gridOffsetY + i * CELL_SIZE, LIGHTGRAY);
+        DrawLine(gridOffsetX + i * CELL_SIZE, gridOffsetY, gridOffsetX + i * CELL_SIZE, gridOffsetY + GRID_SIZE * CELL_SIZE, LIGHTGRAY);
     }
 
     int humanSpacing = CELL_SIZE * 2; // İnsan birimleri için aralık
@@ -1385,18 +1385,18 @@ void DrawBattleGrid(Human_Unit *HU, Ork_Unit *OU) {
     // İnsan birimlerinin yerleştirilmesi - Üst satırlar
     PlaceUnitsOnGrid(gridOffsetX, gridOffsetY, HU->piyadeler, BLUE, "Piyade", humanSpacing);
     PlaceUnitsOnGrid(gridOffsetX, gridOffsetY + CELL_SIZE * 2, HU->okcular, GREEN, "Okcu", humanSpacing);
-    PlaceUnitsOnGrid(gridOffsetX, gridOffsetY + CELL_SIZE * 4, HU->suvariler, DARKBLUE, "Suvari", humanSpacing);
-    PlaceUnitsOnGrid(gridOffsetX, gridOffsetY + CELL_SIZE * 6, HU->kusatma_makineleri, YELLOW, "Kusatma", humanSpacing);
+    PlaceUnitsOnGrid(gridOffsetX, gridOffsetY + CELL_SIZE * 4, HU->suvariler, YELLOW, "Suvari", humanSpacing);
+    PlaceUnitsOnGrid(gridOffsetX, gridOffsetY + CELL_SIZE * 6, HU->kusatma_makineleri, GRAY , "Kusatma", humanSpacing);
 
     // Ork birimlerinin yerleştirilmesi - Alt satırlar
     int orkStartY = gridOffsetY + CELL_SIZE * 8; // Orklar için daha alt satırlardan başlatıyoruz
-    PlaceUnitsOnGrid(gridOffsetX, orkStartY + CELL_SIZE * 5 , OU->ork_dovusculeri, RED, "OrkD", orkSpacing);
-    PlaceUnitsOnGrid(gridOffsetX, orkStartY + CELL_SIZE * 7, OU->mizrakcilar, ORANGE, "Mizrakci", orkSpacing);
-    PlaceUnitsOnGrid(gridOffsetX, orkStartY + CELL_SIZE * 9, OU->varg_binicileri, PURPLE, "Varg", orkSpacing);
-    PlaceUnitsOnGrid(gridOffsetX, orkStartY + CELL_SIZE * 11, OU->troller, DARKGRAY, "Troll", orkSpacing);
+    PlaceUnitsOnGrid(gridOffsetX, orkStartY + CELL_SIZE * 5 , OU->ork_dovusculeri, BLACK, "OrkD", orkSpacing);
+    PlaceUnitsOnGrid(gridOffsetX, orkStartY + CELL_SIZE * 7, OU->mizrakcilar, RED, "Mizrakci", orkSpacing);
+    PlaceUnitsOnGrid(gridOffsetX, orkStartY + CELL_SIZE * 9, OU->varg_binicileri, BROWN, "Varg", orkSpacing);
+    PlaceUnitsOnGrid(gridOffsetX, orkStartY + CELL_SIZE * 11, OU->troller, ORANGE, "Troll", orkSpacing);
 
     // Oyun durumu güncellenir
-    UpdateGame(HU, OU);
+    SavasGuncelle(HU, OU);
 
     // Eğer kazanan belirlenmişse, sonucu ekrana sabit olarak yazdır
     if (kazananMesaj != NULL) {
@@ -1525,7 +1525,7 @@ int main()
     SetTargetFPS(60);
 
     // Başlangıç durumu
-    DrawBattleGrid(&HU, &OU);
+    SavasAlaniCiz(&HU, &OU);
     DrawText("Başlangıç Durumu", 50, 10, 20, BLACK);
     DrawText("Savaş başlatmak için bir tuşa basın...", 50, 30, 20, DARKGRAY);
 
@@ -1534,7 +1534,7 @@ int main()
         ClearBackground(RAYWHITE);
 
         // Başlangıç durumu
-        DrawBattleGrid(&HU, &OU);
+        SavasAlaniCiz(&HU, &OU);
 
         if (IsKeyPressed(KEY_SPACE)) { // Savaş için boşluk tuşuna bas
 
@@ -1548,14 +1548,14 @@ int main()
            }
             ClearBackground(RAYWHITE);
             DrawText("Savaş Sonrası Durum", 50, 10, 20, BLACK);
-            DrawBattleGrid(&HU, &OU);
+            SavasAlaniCiz(&HU, &OU);
             DrawText("Son durumu görmek için herhangi bir tuşa basın...", 50, 30, 20, BLACK);
             while (!WindowShouldClose() && !IsKeyPressed(KEY_SPACE)) {
                 // Son durumu bekler
                 BeginDrawing();
                 ClearBackground(RAYWHITE);
                 DrawText("Savaş Sonrası Durum", 50, 10, 20, BLACK);
-                DrawBattleGrid(&HU, &OU);
+                SavasAlaniCiz(&HU, &OU);
                 EndDrawing();
             }
             ClearBackground(RAYWHITE);
