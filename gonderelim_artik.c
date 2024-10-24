@@ -410,17 +410,17 @@ void yazdir_human_unit(const char filename, Human_Unit *hu, Human_Creature *HC, 
         fprintf(file, "Saldiri_Gelistirmesi Seviye_3\n");
     }
 
-    if(HR->elit_egitim.seviye_1.sayi)
+    if(HR->elit_egitim.seviye_1.sayi == 1)
     {
         fprintf(file, "Elit_Egitim Seviye_1\n");
     }
 
-    if(HR->elit_egitim.seviye_2.sayi)
+    if(HR->elit_egitim.seviye_2.sayi == 1)
     {
         fprintf(file, "Elit_Egitim Seviye_2\n");
     }
 
-    if(HR->elit_egitim.seviye_3.sayi)
+    if(HR->elit_egitim.seviye_3.sayi == 1)
     {
         fprintf(file, "Elit_Egitim Seviye_3\n");
     }
@@ -545,17 +545,17 @@ void yazdir_ork_unit(const char filename, Ork_Unit *ou, Ork_Creature *OC, Ork_He
         fprintf(file, "Saldiri_Gelistirmesi Seviye_3\n");
     }
 
-    if(OR->elit_egitim.seviye_1.sayi)
+    if(OR->elit_egitim.seviye_1.sayi == 1)
     {
         fprintf(file, "Elit_Egitim Seviye_1\n");
     }
 
-    if(OR->elit_egitim.seviye_2.sayi)
+    if(OR->elit_egitim.seviye_2.sayi == 1)
     {
         fprintf(file, "Elit_Egitim Seviye_2\n");
     }
 
-    if(OR->elit_egitim.seviye_3.sayi)
+    if(OR->elit_egitim.seviye_3.sayi == 1)
     {
         fprintf(file, "Elit_Egitim Seviye_3\n");
     }
@@ -1414,7 +1414,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
         HU->kusatma_makineleri.saldiri *= 1.3;
     }
 
-    if(HR->elit_egitim.seviye_1.sayi)
+    if(HR->elit_egitim.seviye_1.sayi == 1)
     {
         HU->piyadeler.kritik_sans += 5;
         HU->okcular.kritik_sans += 5;
@@ -1422,7 +1422,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
         HU->kusatma_makineleri.kritik_sans += 5;
     }
 
-    if(HR->elit_egitim.seviye_2.sayi)
+    if(HR->elit_egitim.seviye_2.sayi == 1)
     {
         HU->piyadeler.kritik_sans += 10;
         HU->okcular.kritik_sans += 10;
@@ -1430,7 +1430,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
         HU->kusatma_makineleri.kritik_sans += 10;
     }
 
-    if(HR->elit_egitim.seviye_3.sayi)
+    if(HR->elit_egitim.seviye_3.sayi == 1)
     {
         HU->piyadeler.kritik_sans += 15;
         HU->okcular.kritik_sans += 15;
@@ -1499,7 +1499,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
         OU->troller.saldiri *= 1.3;
     }
 
-    if(OR->elit_egitim.seviye_1.sayi)
+    if(OR->elit_egitim.seviye_1.sayi == 1)
     {
         OU->ork_dovusculeri.kritik_sans += 5;
         OU->mizrakcilar.kritik_sans += 5;
