@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "raylib.h"
 #include "include/curl/curl.h"
 
 #undef DrawText
 #define GRID_SIZE 20
 #define MAX_UNITS_PER_CELL 100
-#define CELL_SIZE 40 // Hücre boyutu (pikseller)
+#define CELL_SIZE 45
 
 const char* url_list[] =
 {
@@ -168,10 +169,6 @@ Research HR;
 Research OR;
 
 
-
-
-
-
 void parse_creature_json(const char *filename, Human_Creature *HC, Ork_Creature *OC)
 {
     FILE *file = fopen(filename, "r");
@@ -310,26 +307,259 @@ void parse_creature_json(const char *filename, Human_Creature *HC, Ork_Creature 
     fclose(file);
 }
 
-void yazdir_human_unit(Human_Unit *hu) {
-    printf("Piyadeler - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
+void yazdir_human_unit(const char filename, Human_Unit *hu, Human_Creature *HC, Human_Hero *HH, Research *HR) {
+    FILE *file = fopen(filename, "a");
+    if (file == NULL)
+    {
+        printf("Dosya Acilamadi: %s\n", filename);
+        return;
+    }
+    fprintf(file, "Insan_Imparatorlugu: \n");
+
+    fprintf(file, "Piyadeler - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
             hu->piyadeler.saldiri, hu->piyadeler.savunma, hu->piyadeler.saglik, hu->piyadeler.kritik_sans, hu->piyadeler.sayi);
-    printf("Okçular - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
+    fprintf(file, "Okcular - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
             hu->okcular.saldiri, hu->okcular.savunma, hu->okcular.saglik, hu->okcular.kritik_sans, hu->okcular.sayi);
-    printf("Süvariler - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
+    fprintf(file, "Suvariler - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
             hu->suvariler.saldiri, hu->suvariler.savunma, hu->suvariler.saglik, hu->suvariler.kritik_sans, hu->suvariler.sayi);
-    printf("Kuşatma Makineleri - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
+    fprintf(file, "Kusatma Makineleri - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
             hu->kusatma_makineleri.saldiri, hu->kusatma_makineleri.savunma, hu->kusatma_makineleri.saglik, hu->kusatma_makineleri.kritik_sans, hu->kusatma_makineleri.sayi);
+
+    fprintf(file, "Kahramanlar: \n");
+
+    if (HH->alparslan.sayi == 1)
+    {
+        fprintf(file, "Alparslan\n");
+    }
+
+    if (HH->fsm.sayi == 1)
+    {
+        fprintf(file, "Fatih_Sultan_Mehmet\n");
+    }
+
+    if (HH->metehan.sayi == 1)
+    {
+        fprintf(file, "Mete_Han\n");
+    }
+
+    if(HH->yss.sayi == 1)
+    {
+        fprintf(file, "Yavuz_Sultan_Selim\n");
+    }
+
+    if(HH->tugrul_bey.sayi == 1)
+    {
+        fprintf(file, "Tugrul_Bey\n");
+    }
+
+    fprintf(file, "Canavarlar: \n");
+
+    if(HC->ejderha.sayi == 1)
+    {
+        fprintf(file, "Ejderha\n");
+    }
+
+    if(HC->agri_dagi.sayi == 1)
+    {
+        fprintf(file, "Agri_Dagi_Devleri\n");
+    }
+
+    if(HC->tepegoz.sayi == 1)
+    {
+        fprintf(file, "Tepegoz\n");
+
+    }
+
+    if(HC->karakurt.sayi == 1)
+    {
+        fprintf(file, "Karakurt\n");
+    }
+
+    if(HC->samur.sayi == 1)
+    {
+        fprintf(file, "Samur\n");
+    }
+
+    fprintf(file, "Arastirmalar: \n");
+
+    if (HR->savunma_ustaligi.seviye_1.sayi == 1)
+    {
+        fprintf(file, "Savunma_Ustaligi Seviye_1\n");
+    }
+    if (HR->savunma_ustaligi.seviye_2.sayi == 1)
+    {
+        fprintf(file, "Savunma_Ustaligi Seviye_2\n");
+    }
+    if (HR->savunma_ustaligi.seviye_3.sayi == 1)
+    {
+        fprintf(file, "Savunma_Ustaligi Seviye_3\n");
+    }
+
+    if(HR->saldiri_gelistirmesi.seviye_1.sayi == 1)
+    {
+        fprintf(file, "Saldiri_Gelistirmesi Seviye_1\n");
+    }
+
+    if(HR->saldiri_gelistirmesi.seviye_2.sayi == 1)
+    {
+        fprintf(file, "Saldiri_Gelistirmesi Seviye_2\n");
+    }
+
+    if(HR->saldiri_gelistirmesi.seviye_3.sayi == 1)
+    {
+        fprintf(file, "Saldiri_Gelistirmesi Seviye_3\n");
+    }
+
+    if(HR->elit_egitim.seviye_1.sayi)
+    {
+        fprintf(file, "Elit_Egitim Seviye_1\n");
+    }
+
+    if(HR->elit_egitim.seviye_2.sayi)
+    {
+        fprintf(file, "Elit_Egitim Seviye_2\n");
+    }
+
+    if(HR->elit_egitim.seviye_3.sayi)
+    {
+        fprintf(file, "Elit_Egitim Seviye_3\n");
+    }
+
+    if(HR->kusatma_ustaligi.seviye_1.sayi == 1)
+    {
+       fprintf(file, "Kusatma_Ustaligi Seviye_1\n");
+    }
+
+    if(HR->kusatma_ustaligi.seviye_2.sayi == 1)
+    {
+       fprintf(file, "Kusatma_Ustaligi Seviye_2\n");
+    }
+
+    if(HR->kusatma_ustaligi.seviye_3.sayi == 1)
+    {
+       fprintf(file, "Kusatma_Ustaligi Seviye_3\n");
+    }
+    fclose(file);
 }
 
-void yazdir_ork_unit(Ork_Unit *ou) {
-    printf("Ork Dövüşçüleri - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
+void yazdir_ork_unit(const char filename, Ork_Unit *ou, Ork_Creature *OC, Ork_Hero *OH, Research *OR) {
+    FILE *file = fopen(filename, "a");
+    if (file == NULL)
+    {
+        printf("Dosya Acilamadi: %s\n", filename);
+        return;
+    }
+
+    fprintf(file, "Ork_Legi: \n");
+
+    fprintf(file, "Ork Dovusculeri - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
             ou->ork_dovusculeri.saldiri, ou->ork_dovusculeri.savunma, ou->ork_dovusculeri.saglik, ou->ork_dovusculeri.kritik_sans, ou->ork_dovusculeri.sayi);
-    printf("Mizrakcilar - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
+    fprintf(file, "Mizrakcilar - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
             ou->mizrakcilar.saldiri, ou->mizrakcilar.savunma, ou->mizrakcilar.saglik, ou->mizrakcilar.kritik_sans, ou->mizrakcilar.sayi);
-    printf("Varg Binicileri - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
+    fprintf(file, "Varg Binicileri - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
             ou->varg_binicileri.saldiri, ou->varg_binicileri.savunma, ou->varg_binicileri.saglik, ou->varg_binicileri.kritik_sans, ou->varg_binicileri.sayi);
-    printf("Troller - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
+    fprintf(file, "Troller - Saldiri: %d, Savunma: %d, Saglik: %d, Kritik Sans: %d, Sayi: %d\n",
             ou->troller.saldiri, ou->troller.savunma, ou->troller.saglik, ou->troller.kritik_sans, ou->troller.sayi);
+
+    fprintf(file, "Kahramanlar: \n");
+
+    if(OH->goruk.sayi == 1)
+    {
+        fprintf(file, "Goruk_Vahsi\n");
+    }
+
+    if(OH->thruk.sayi == 1)
+    {
+        fprintf(file, "Thruk_Kemikkiran\n");
+    }
+
+    if(OH->vrog.sayi == 1)
+    {
+        fprintf(file, "Vrog_Kafakiran\n");
+    }
+
+    if (OH->ugar.sayi == 1)
+    {
+        fprintf(file, "Ugar_Zalim\n");
+    }
+
+    fprintf(file, "Canavarlar: \n");
+
+    if(OC->troll.sayi == 1)
+    {
+        fprintf(file, "Kara_Troll\n");
+    }
+
+    if(OC->golge.sayi == 1)
+    {
+        fprintf(file, "Golge_Kurtlari\n");
+    }
+
+    if(OC->camur.sayi == 1)
+    {
+        fprintf(file, "Camur_Devleri\n");
+    }
+
+    if(OC->ates_iblisi.sayi == 1)
+    {
+        fprintf(file, "Ates_Iblisi\n");
+    }
+
+    if(OC->makrog.sayi == 1)
+    {
+        fprintf(file, "Makrog_Savas_Beyi\n");
+    }
+
+    if(OC->buz_devi.sayi == 1)
+    {
+        fprintf(file, "Buz_Devleri\n");
+    }
+
+    fprintf(file, "Arastirmalar: \n");
+
+    if (OR->savunma_ustaligi.seviye_1.sayi == 1)
+    {
+        fprintf(file, "Savunma_Ustaligi Seviye_1\n");
+    }
+    if (OR->savunma_ustaligi.seviye_2.sayi == 1)
+    {
+        fprintf(file, "Savunma_Ustaligi Seviye_2\n");
+    }
+    if (OR->savunma_ustaligi.seviye_3.sayi == 1)
+    {
+        fprintf(file, "Savunma_Ustaligi Seviye_3\n");
+    }
+
+    if(OR->saldiri_gelistirmesi.seviye_1.sayi == 1)
+    {
+        fprintf(file, "Saldiri_Gelistirmesi Seviye_1\n");
+    }
+
+    if(OR->saldiri_gelistirmesi.seviye_2.sayi == 1)
+    {
+        fprintf(file, "Saldiri_Gelistirmesi Seviye_2\n");
+    }
+
+    if(OR->saldiri_gelistirmesi.seviye_3.sayi == 1)
+    {
+        fprintf(file, "Saldiri_Gelistirmesi Seviye_3\n");
+    }
+
+    if(OR->elit_egitim.seviye_1.sayi)
+    {
+        fprintf(file, "Elit_Egitim Seviye_1\n");
+    }
+
+    if(OR->elit_egitim.seviye_2.sayi)
+    {
+        fprintf(file, "Elit_Egitim Seviye_2\n");
+    }
+
+    if(OR->elit_egitim.seviye_3.sayi)
+    {
+        fprintf(file, "Elit_Egitim Seviye_3\n");
+    }
+    fclose(file);
 }
 
 void parse_hero_json(const char *filename, Human_Hero *HH, Ork_Hero *OH)
@@ -901,7 +1131,6 @@ void parse_unit_json(const char *filename, Human_Unit *HU, Ork_Unit *OU)
     fclose(file);
 }
 
-
 int kritik_vurus_hesapla(Unit *unit, int adim)
 {
     // Birimin kritik vuruş zamanını hesapla
@@ -951,26 +1180,25 @@ void savunma_gucu_hesapla(Human_Unit *HU , Ork_Unit *OU ,double *toplam_insan_sa
 
 void ork_saglik_hesapla(Ork_Unit *OU, double net_hasar_insan, double *toplam_ork_savunma)
 {
-    // Oran Hesaplama
-
-
+    // Oran Hesaplama(Ork)
     double oran_ork_dovusculeri = (double)(OU->ork_dovusculeri.savunma * OU->ork_dovusculeri.sayi) / *toplam_ork_savunma;
     double oran_mizrakcilar = (double)(OU->mizrakcilar.savunma * OU->mizrakcilar.sayi) / *toplam_ork_savunma;
     double oran_varg_binicileri = (double)(OU->varg_binicileri.savunma * OU->varg_binicileri.sayi) / *toplam_ork_savunma;
     double oran_troller = (double)(OU->troller.savunma * OU->troller.sayi) / *toplam_ork_savunma;
 
-    // Hasar Dağılımı
 
-
+    // Hasar Dagilimi
     double hasar_ork_dovusculeri = net_hasar_insan * oran_ork_dovusculeri;
     double hasar_mizrakcilar = net_hasar_insan * oran_mizrakcilar;
     double hasar_varg_binicileri = net_hasar_insan * oran_varg_binicileri;
     double hasar_troller = net_hasar_insan * oran_troller;
 
+    //
     OU->ork_dovusculeri.saglik -= (hasar_ork_dovusculeri / OU->ork_dovusculeri.sayi);
     OU->mizrakcilar.saglik -= (hasar_mizrakcilar / OU->mizrakcilar.sayi);
     OU->varg_binicileri.saglik -= (hasar_varg_binicileri / OU->varg_binicileri.sayi);
     OU->troller.saglik -= (hasar_troller / OU->troller.sayi);
+
 
     // Sağlık 0'ın altına düşerse, 0'da sabitle.
 
@@ -1000,10 +1228,10 @@ void insan_saglik_hesapla(Human_Unit *HU, double net_hasar_ork, double *toplam_i
     double hasar_kusatma = net_hasar_ork * oran_kusatma;
 
     // Sayi Guncelleme(insan)
-    HU->piyadeler.saglik -= hasar_piyadeler / HU->piyadeler.saglik;
-    HU->okcular.saglik -= hasar_okcular / HU->okcular.saglik;
-    HU->suvariler.saglik -= hasar_suvariler / HU->suvariler.saglik;
-    HU->kusatma_makineleri.saglik -= hasar_kusatma / HU->kusatma_makineleri.saglik;
+    HU->piyadeler.saglik -= hasar_piyadeler / HU->piyadeler.sayi;
+    HU->okcular.saglik -= hasar_okcular / HU->okcular.sayi;
+    HU->suvariler.saglik -= hasar_suvariler / HU->suvariler.sayi;
+    HU->kusatma_makineleri.saglik -= hasar_kusatma / HU->kusatma_makineleri.sayi;
 
     // sayi 0'in altina duserse, 0'da sabitle.(insan)
     if (HU->piyadeler.saglik <= 0) HU->piyadeler.saglik = 0;
@@ -1018,7 +1246,7 @@ void insan_saglik_hesapla(Human_Unit *HU, double net_hasar_ork, double *toplam_i
 
 }
 
-int insan_net_hasar_hesaplama(Human_Unit *HU, double *toplam_insan_saldiri, double *toplam_insan_savunma, double *toplam_ork_savunma)
+int insan_net_hasar_hesaplama(Human_Unit *HU, double *toplam_insan_saldiri, double *toplam_ork_savunma)
 {
     int insan_net_hasar = *toplam_insan_saldiri * (1 - (*toplam_ork_savunma / *toplam_insan_saldiri));
     if (insan_net_hasar < 0)
@@ -1026,7 +1254,7 @@ int insan_net_hasar_hesaplama(Human_Unit *HU, double *toplam_insan_saldiri, doub
     return (insan_net_hasar);
 }
 
-int ork_net_hasar_hesaplama(Ork_Unit *OU, double *toplam_ork_saldiri, double *toplam_ork_savunma, double *toplam_insan_savunma)
+int ork_net_hasar_hesaplama(Ork_Unit *OU, double *toplam_ork_saldiri, double *toplam_insan_savunma)
 {
     int ork_net_hasar = *toplam_ork_saldiri * (1 - (*toplam_insan_savunma / *toplam_ork_saldiri));
     if (ork_net_hasar < 0)
@@ -1247,7 +1475,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
         OU->troller.savunma *= 1.3;
     }
 
-    if(HR->saldiri_gelistirmesi.seviye_1.sayi == 1)
+    if(OR->saldiri_gelistirmesi.seviye_1.sayi == 1)
     {
         OU->ork_dovusculeri.saldiri *=1.1;
         OU->mizrakcilar.saldiri *=1.1;
@@ -1255,7 +1483,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
         OU->troller.saldiri *= 1.1;
     }
 
-    if(HR->saldiri_gelistirmesi.seviye_2.sayi == 1)
+    if(OR->saldiri_gelistirmesi.seviye_2.sayi == 1)
     {
         OU->ork_dovusculeri.saldiri *=1.2;
         OU->mizrakcilar.saldiri *=1.2;
@@ -1263,7 +1491,7 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
         OU->troller.saldiri *= 1.1;
     }
 
-    if(HR->saldiri_gelistirmesi.seviye_3.sayi == 1)
+    if(OR->saldiri_gelistirmesi.seviye_3.sayi == 1)
     {
         OU->ork_dovusculeri.saldiri *=1.3;
         OU->mizrakcilar.saldiri *=1.3;
@@ -1298,72 +1526,115 @@ void add_bonus_value(Human_Unit *HU, Ork_Unit *OU, Human_Hero *HH, Ork_Hero *OH,
 
 
 
-// Sağlık barı çizimi fonksiyonu
-void DrawHealthBar(int x, int y, int health) {
-    int barWidth = 40;
-    int barHeight = 5;
-    Color barColor = (health > 50) ? (Color){0, 255, 0, 180} :
+// Saglik bari cizdirme
+void BarCizimi(int x, int y, int health) {
+    int barKalinlik = 40;
+    int barUzunluk = 5;
+    Color barRengi = (health > 50) ? (Color){0, 255, 0, 180} :
                      (health > 20) ? (Color){255, 255, 0, 180} :
                      (Color){255, 0, 0, 180};
 
-    DrawRectangle(x - barWidth / 2, y - 15, barWidth * health / 100, barHeight, barColor);
-    DrawText(TextFormat("%d", health), x + 5, y - 20, 10, BLACK); // Can yüzdesini göster
+    DrawRectangle(x - barKalinlik / 2, y - 15, barKalinlik * health / 100, barUzunluk, barRengi);
+    DrawText(TextFormat("%d", health), x + 5, y - 20, 10, BLACK); // Can degerini goster
 }
 
+const char* kazananMesaj = NULL; // Kazananı saklayacak global değişken
+
+// Kazanan irki belirleme
+const char* KazananTespit(Human_Unit *HU, Ork_Unit *OU) {
+
+    //insan toplam saglik
+    int insanSaglik = HU->piyadeler.saglik + HU->okcular.saglik + HU->suvariler.saglik + HU->kusatma_makineleri.saglik;
+
+    // ork toplam saglik
+    int orkSaglik = OU->ork_dovusculeri.saglik + OU->mizrakcilar.saglik + OU->varg_binicileri.saglik + OU->troller.saglik;
+
+    // Kazananı belirleme
+    if (insanSaglik <= 0 && orkSaglik > 0) {
+        return "Orklar Kazandi!";
+    } else if (orkSaglik <= 0 && insanSaglik > 0) {
+        return "Insanlar Kazandi!";
+    } else if (insanSaglik <= 0 && orkSaglik <= 0) {
+        return "Berabere!";
+    } else {
+        return NULL; // Savaş hala devam ediyor
+    }
+}
+
+
+void SavasGuncelle(Human_Unit *HU, Ork_Unit *OU) {
+
+    if (IsKeyPressed(KEY_SPACE) && kazananMesaj == NULL) {
+        kazananMesaj = KazananTespit(HU, OU);
+    }
+}
 // Birim simgelerini çizme fonksiyonu
-void DrawUnit(int x, int y, Unit unit, Color color, const char* unitName) {
-    DrawHealthBar(x, y, unit.saglik);
+void BirimCizme(int x, int y, Unit unit, Color color, const char* unitName) {
+    BarCizimi(x, y, unit.saglik);
     DrawCircle(x, y, 10, color);
-    DrawText(unitName, x - 15, y + 10, 10, BLACK); // Birim ismini göster
+    DrawText(unitName, x - 20, y + 15, 10, BLACK); // Birim ismini hafif aşağı kaydırdık
 }
 
 // Izgara üzerine birim yerleştirme fonksiyonu
-void PlaceUnitsOnGrid(int startX, int startY, Unit unit, Color color, const char* unitName) {
+void PlaceUnitsOnGrid(int startX, int startY, Unit unit, Color color, const char* unitName, int spacing) {
     int unitsRemaining = unit.sayi;
     int gridX = startX;
     int gridY = startY;
 
-    for (int i = 0; i < GRID_SIZE * GRID_SIZE && unitsRemaining > 0; i++) {
+    for (int i = 0; i < GRID_SIZE && unitsRemaining > 0; i++) {
         int unitsInThisCell = (unitsRemaining > MAX_UNITS_PER_CELL) ? MAX_UNITS_PER_CELL : unitsRemaining;
         int cellX = (i % GRID_SIZE) * CELL_SIZE + gridX;
-        int cellY = (i / GRID_SIZE) * CELL_SIZE + gridY;
+        int cellY = gridY + (i / GRID_SIZE) * spacing; // spacing ile satırlar arasında boşluk bırakıyoruz
         int centerX = cellX + CELL_SIZE / 2;
         int centerY = cellY + CELL_SIZE / 2;
 
-        // Birimi çiz
-        DrawUnit(centerX, centerY, unit, color, unitName);
+        // Birimi ciz
+        BirimCizme(centerX, centerY, unit, color, unitName);
 
         char countText[4];
         sprintf(countText, "%d", unitsInThisCell);
-        DrawText(TextFormat("Sayi: %d", unitsInThisCell), centerX - 10, centerY + 20, 10, BLACK);
+        DrawText(TextFormat("Sayi:%d", unitsInThisCell), centerX - 15, centerY + 30, 10, BLACK);
 
         unitsRemaining -= unitsInThisCell;
     }
+
 }
 
 // Izgara çizimi ve birimlerin yerleştirilmesi
-void DrawBattleGrid(Human_Unit *HU, Ork_Unit *OU) {
+void SavasAlaniCiz(Human_Unit *HU, Ork_Unit *OU) {
     int gridOffsetX = 50;
     int gridOffsetY = 50;
-    Color gridColor = (Color){200, 200, 200, 255};
+
 
     // Izgara çizimi
     for (int i = 0; i <= GRID_SIZE; i++) {
-        DrawLine(gridOffsetX, gridOffsetY + i * CELL_SIZE, gridOffsetX + GRID_SIZE * CELL_SIZE, gridOffsetY + i * CELL_SIZE, gridColor);
-        DrawLine(gridOffsetX + i * CELL_SIZE, gridOffsetY, gridOffsetX + i * CELL_SIZE, gridOffsetY + GRID_SIZE * CELL_SIZE, gridColor);
+        DrawLine(gridOffsetX, gridOffsetY + i * CELL_SIZE, gridOffsetX + GRID_SIZE * CELL_SIZE, gridOffsetY + i * CELL_SIZE, LIGHTGRAY);
+        DrawLine(gridOffsetX + i * CELL_SIZE, gridOffsetY, gridOffsetX + i * CELL_SIZE, gridOffsetY + GRID_SIZE * CELL_SIZE, LIGHTGRAY);
     }
 
-    // İnsan birimlerinin yerleştirilmesi
-    PlaceUnitsOnGrid(gridOffsetX, gridOffsetY, HU->piyadeler, BLUE, "Piyade");
-    PlaceUnitsOnGrid(gridOffsetX, gridOffsetY + CELL_SIZE * 2, HU->okcular, GREEN, "Okcu");
-    PlaceUnitsOnGrid(gridOffsetX, gridOffsetY + CELL_SIZE * 4, HU->suvariler, DARKBLUE, "Suvari");
-    PlaceUnitsOnGrid(gridOffsetX, gridOffsetY + CELL_SIZE * 6, HU->kusatma_makineleri, YELLOW, "Kusatma Makinesi");
+    int humanSpacing = CELL_SIZE * 2; // İnsan birimleri için aralık
+    int orkSpacing = CELL_SIZE * 2;   // Ork birimleri için aralık
 
-    // Ork birimlerinin yerleştirilmesi
-    PlaceUnitsOnGrid(gridOffsetX + CELL_SIZE * 10, gridOffsetY, OU->ork_dovusculeri, RED, "Ork");
-    PlaceUnitsOnGrid(gridOffsetX + CELL_SIZE * 10, gridOffsetY + CELL_SIZE * 2, OU->mizrakcilar, ORANGE, "Mizrakci");
-    PlaceUnitsOnGrid(gridOffsetX + CELL_SIZE * 10, gridOffsetY + CELL_SIZE * 4, OU->varg_binicileri, PURPLE, "Varg Binicisi");
-    PlaceUnitsOnGrid(gridOffsetX + CELL_SIZE * 10, gridOffsetY + CELL_SIZE * 6, OU->troller, DARKGRAY, "Troll");
+    // İnsan birimlerinin yerleştirilmesi - Üst satırlar
+    PlaceUnitsOnGrid(gridOffsetX, gridOffsetY, HU->piyadeler, BLUE, "Piyade", humanSpacing);
+    PlaceUnitsOnGrid(gridOffsetX, gridOffsetY + CELL_SIZE * 2, HU->okcular, GREEN, "Okcu", humanSpacing);
+    PlaceUnitsOnGrid(gridOffsetX, gridOffsetY + CELL_SIZE * 4, HU->suvariler, YELLOW, "Suvari", humanSpacing);
+    PlaceUnitsOnGrid(gridOffsetX, gridOffsetY + CELL_SIZE * 6, HU->kusatma_makineleri, GRAY , "Kusatma", humanSpacing);
+
+    // Ork birimlerinin yerleştirilmesi - Alt satırlar
+    int orkStartY = gridOffsetY + CELL_SIZE * 8; // Orklar için daha alt satırlardan başlatıyoruz
+    PlaceUnitsOnGrid(gridOffsetX, orkStartY + CELL_SIZE * 5 , OU->ork_dovusculeri, BLACK, "OrkD", orkSpacing);
+    PlaceUnitsOnGrid(gridOffsetX, orkStartY + CELL_SIZE * 7, OU->mizrakcilar, RED, "Mizrakci", orkSpacing);
+    PlaceUnitsOnGrid(gridOffsetX, orkStartY + CELL_SIZE * 9, OU->varg_binicileri, BROWN, "Varg", orkSpacing);
+    PlaceUnitsOnGrid(gridOffsetX, orkStartY + CELL_SIZE * 11, OU->troller, ORANGE, "Troll", orkSpacing);
+
+    // Oyun durumu güncellenir
+    SavasGuncelle(HU, OU);
+
+    // Eğer kazanan belirlenmişse, sonucu ekrana sabit olarak yazdır
+    if (kazananMesaj != NULL) {
+        DrawText(kazananMesaj, 400, 400, 20, BLACK); // Kazananı ekrana sabit yazdır
+    }
 }
 void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adim)
 {
@@ -1373,7 +1644,6 @@ void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adi
         printf("Dosya Acilamadi: %s\n", filename);
         return;
     }
-    fprintf(file, "\nAdim %d:\n", adim);
 
     double toplam_insan_saldiri = 0;
     double toplam_ork_saldiri = 0;
@@ -1393,9 +1663,24 @@ void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adi
 
     if(adim % 2 == 0)
     {
-        double net_hasar_ork = ork_net_hasar_hesaplama(OU, &toplam_ork_saldiri, &toplam_ork_savunma, &toplam_insan_savunma);
-        fprintf(file, "Ork irki insan birimlerine %.2f hasar verdi.\n", net_hasar_ork);
+        fprintf(file, "\nAdim %d: Ork_Legi'nin Saldirisi\n", adim);
+
+        fprintf(file, "Saldiri Gucu Hesaplama (Bonuslar Dahil):\n");
+
+        fprintf(file, "Ork Dovusculeri: %d Birim x %d Saldiri Gucu\nMizrakcilar: %d Birim x %d Saldiri Gucu\nVarg Binicileri: %d Birim x %d Saldiri Gucu\nTroller: %d Birim x %d Saldiri Gucu\n",
+                OU->ork_dovusculeri.sayi, OU->ork_dovusculeri.saldiri, OU->mizrakcilar.sayi, OU->mizrakcilar.saldiri, OU->varg_binicileri.sayi, OU->varg_binicileri.saldiri, OU->troller.sayi, OU->troller.saldiri);
+
+        fprintf(file, "Toplam Saldiri Gucu: %d\n", toplam_ork_saldiri);
+
+        fprintf(file, "Insan Imparatorlugu Toplam Savunma Gucu: %d\n", toplam_insan_savunma);
+
+        double net_hasar_ork = ork_net_hasar_hesaplama(OU, &toplam_ork_saldiri, &toplam_insan_savunma);
+
+        fprintf(file, "Ork irki insan birimlerine %.2f net hasar verdi.\n", net_hasar_ork);
+
         insan_saglik_hesapla(HU, net_hasar_ork, &toplam_insan_savunma);
+
+        fprintf(file, "Saldırı Sonucunda:\n");
         fprintf(file, "Insan Piyadeleri: \n Sayi: %d\tSaglik: %d\n", HU->piyadeler.sayi, HU->piyadeler.saglik);
         fprintf(file, "Insan Okculari: \n Sayi: %d\tSaglik: %d\n", HU->okcular.sayi, HU->okcular.saglik);
         fprintf(file, "Insan Suvarileri: \n Sayi: %d\tSaglik: %d\n", HU->suvariler.sayi, HU->suvariler.saglik);
@@ -1405,9 +1690,23 @@ void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adi
 
     if(adim % 2 == 1)
     {
-        double net_hasar_insan = insan_net_hasar_hesaplama(HU, &toplam_insan_saldiri, &toplam_insan_savunma, &toplam_ork_savunma);
-        fprintf(file, "Insan irki ork birimlerine %.2f hasar verdi.\n", net_hasar_insan);
+        fprintf(file, "\nAdim %d: Insan_Imparatorlugu'nun Saldirisi\n", adim);
+
+        fprintf(file, "Saldiri Gucu Hesaplama (Bonuslar Dahil):\n");
+
+        fprintf(file, "Piyadeler: %d Birim x %d Saldiri Gucu\nOkcular: %d Birim x %d Saldiri Gucu\nSuvariler: %d Birim x %d Saldiri Gucu\nKusatma Makineleri: %d Birim x %d Saldiri Gucu\n",
+                HU->piyadeler.sayi, HU->piyadeler.saldiri, HU->okcular.sayi, HU->okcular.saldiri, HU->suvariler.sayi, HU->suvariler.saldiri, HU->kusatma_makineleri.sayi, HU->kusatma_makineleri.saldiri);
+        fprintf(file, "Toplam Saldiri Gucu: %d\n", toplam_insan_saldiri);
+
+        fprintf(file, "Ork Lejyonu Toplam Savunma Gucu: %d\n", toplam_ork_savunma);
+
+        double net_hasar_insan = insan_net_hasar_hesaplama(HU, &toplam_insan_saldiri, &toplam_ork_savunma);
+
+        fprintf(file, "Insan irki ork birimlerine %.2f net hasar verdi.\n", net_hasar_insan);
+
         ork_saglik_hesapla(OU, net_hasar_insan, &toplam_ork_savunma);
+
+        fprintf(file, "Saldırı Sonucunda:\n");
         fprintf(file, "Ork Dovusculeri: \n Sayi: %d\tSaglik: %d\n", OU->ork_dovusculeri.sayi, OU->ork_dovusculeri.saglik);
         fprintf(file, "Ork Mizrakcilari: \n Sayi: %d\tSaglik: %d\n", OU->mizrakcilar.sayi, OU->mizrakcilar.saglik);
         fprintf(file, "Ork Varg Binicileri: \n Sayi: %d\tSaglik: %d\n", OU->varg_binicileri.sayi, OU->varg_binicileri.saglik);
@@ -1418,19 +1717,25 @@ void savas_adim_adim(const char *filename, Human_Unit *HU, Ork_Unit *OU, int adi
     {
         HU->piyadeler.saldiri *= 0.9;
         HU->piyadeler.savunma *= 0.9;
+
         HU->okcular.saldiri *= 0.9;
         HU->okcular.savunma *= 0.9;
+
         HU->suvariler.saldiri *= 0.9;
         HU->suvariler.savunma *= 0.9;
+
         HU->kusatma_makineleri.saldiri *= 0.9;
         HU->kusatma_makineleri.savunma *= 0.9;
 
         OU->ork_dovusculeri.saldiri *= 0.9;
         OU->ork_dovusculeri.savunma *= 0.9;
+
         OU->mizrakcilar.saldiri *= 0.9;
         OU->mizrakcilar.savunma *= 0.9;
+
         OU->varg_binicileri.saldiri *= 0.9;
         OU->varg_binicileri.savunma *= 0.9;
+
         OU->troller.saldiri *= 0.9;
         OU->troller.savunma *= 0.9;
     }
@@ -1480,22 +1785,28 @@ int main()
         printf("Dosya Acilamadi: %s\n", "savas_sim.txt");
         return 0;
     }
+    fprintf(file, "Savas Oncesi Durum: \n");
+
 	fclose(file);
 
+	yazdir_human_unit("savas_sim.txt", &HU, &HC, &HH, &HR);
+	yazdir_ork_unit("savas_sim.txt", &OU, &OC, &OH, &OR);
+
 // Raylib başlat
-    InitWindow(800, 600, "Savaş Simülasyonu");
+    InitWindow(1000, 1000, "Savaş Simülasyonu");
     SetTargetFPS(60);
 
     // Başlangıç durumu
-    DrawBattleGrid(&HU, &OU);
+    SavasAlaniCiz(&HU, &OU);
     DrawText("Başlangıç Durumu", 50, 10, 20, BLACK);
     DrawText("Savaş başlatmak için bir tuşa basın...", 50, 30, 20, DARKGRAY);
+
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
         // Başlangıç durumu
-        DrawBattleGrid(&HU, &OU);
+        SavasAlaniCiz(&HU, &OU);
 
         if (IsKeyPressed(KEY_SPACE)) { // Savaş için boşluk tuşuna bas
 
@@ -1509,14 +1820,14 @@ int main()
            }
             ClearBackground(RAYWHITE);
             DrawText("Savaş Sonrası Durum", 50, 10, 20, BLACK);
-            DrawBattleGrid(&HU, &OU);
+            SavasAlaniCiz(&HU, &OU);
             DrawText("Son durumu görmek için herhangi bir tuşa basın...", 50, 30, 20, BLACK);
             while (!WindowShouldClose() && !IsKeyPressed(KEY_SPACE)) {
                 // Son durumu bekler
                 BeginDrawing();
                 ClearBackground(RAYWHITE);
                 DrawText("Savaş Sonrası Durum", 50, 10, 20, BLACK);
-                DrawBattleGrid(&HU, &OU);
+                SavasAlaniCiz(&HU, &OU);
                 EndDrawing();
             }
             ClearBackground(RAYWHITE);
