@@ -35,8 +35,13 @@ public class Ucak extends HavaAraci {
     }
     @Override
     public void setDayaniklilik(int dayaniklilik) {
-        this.dayaniklilik = dayaniklilik;
-    }
+        if (dayaniklilik < 0) {
+            this.dayaniklilik = 0;
+        }
+        else{
+            this.dayaniklilik = dayaniklilik;
+            }
+        }
 
     
     
@@ -66,18 +71,18 @@ public class Ucak extends HavaAraci {
    
    @Override
    public void DurumGuncelle(int vurus) {
-       // Dayanıklılığı saldırı değeri ve kara vuruş avantajı kadar azaltıyoruz
+       // DayanÄ±klÄ±lÄ±ÄŸÄ± saldÄ±rÄ± deÄŸeri ve kara vuruÅŸ avantajÄ± kadar azaltÄ±yoruz
        this.dayaniklilik -= vurus;
        if (dayaniklilik < 0) {
-           dayaniklilik = 0; // Dayanıklılık 0'ın altına düşmesin
+           dayaniklilik = 0; // DayanÄ±klÄ±lÄ±k 0'Ä±n altÄ±na dÃ¼ÅŸmesin
        }
 
-       // Seviye puanını güncelle
+       // Seviye puanÄ±nÄ± gÃ¼ncelle
        if (vurus > 10) {
-           this.setSeviyePuani(this.getSeviyePuani() + 1); // Basit bir güncelleme mantığı
+           this.setSeviyePuani(this.getSeviyePuani() + 1); // Basit bir gÃ¼ncelleme mantÄ±ÄŸÄ±
        }
        
-       System.out.println("Güncellenmiş Dayanıklılık: " + dayaniklilik + ", Seviye Puanı: " + getSeviyePuani());
+       System.out.println("GÃ¼ncellenmiÅŸ DayanÄ±klÄ±lÄ±k: " + dayaniklilik + ", Seviye PuanÄ±: " + getSeviyePuani());
    }
     
     
