@@ -60,8 +60,13 @@ public class Sida extends DenizAraci {
 	}
 	@Override
 	public void setDayaniklilik(int dayaniklilik) {
-		this.dayaniklilik = dayaniklilik;
-	}
+        if (dayaniklilik < 0) {
+            this.dayaniklilik = 0;
+        }
+        else{
+            this.dayaniklilik = dayaniklilik;
+            }
+        }
 	
 	
 	
@@ -77,18 +82,18 @@ public class Sida extends DenizAraci {
 	
 	@Override
 	   public void DurumGuncelle(int vurus) {
-	       // Dayanıklılığı saldırı değeri ve kara vuruş avantajı kadar azaltıyoruz
+	       // DayanÃ½klÃ½lÃ½Ã°Ã½ saldÃ½rÃ½ deÃ°eri ve kara vuruÃ¾ avantajÃ½ kadar azaltÃ½yoruz
 	       this.dayaniklilik -= vurus;
 	       if (dayaniklilik < 0) {
-	           dayaniklilik = 0; // Dayanıklılık 0'ın altına düşmesin
+	           dayaniklilik = 0; // DayanÃ½klÃ½lÃ½k 0'Ã½n altÃ½na dÃ¼Ã¾mesin
 	       }
 
-	       // Seviye puanını güncelle
+	       // Seviye puanÃ½nÃ½ gÃ¼ncelle
 	       if (vurus > 10) {
-	           this.setSeviyePuani(this.getSeviyePuani() + 1); // Basit bir güncelleme mantığı
+	           this.setSeviyePuani(this.getSeviyePuani() + 1); // Basit bir gÃ¼ncelleme mantÃ½Ã°Ã½
 	       }
 	       
-	       System.out.println("Güncellenmiş Dayanıklılık: " + dayaniklilik + ", Seviye Puanı: " + getSeviyePuani());
+	       System.out.println("GÃ¼ncellenmiÃ¾ DayanÃ½klÃ½lÃ½k: " + dayaniklilik + ", Seviye PuanÃ½: " + getSeviyePuani());
 	   }
 	
 
