@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
 public class Oyun {
 
@@ -23,15 +26,30 @@ public class Oyun {
 
 
 
+        // Kartları rastgele dağıt
         List<SavasAraci> oyuncuKartlari = kartDagit(tumKartlar);
         List<SavasAraci> bilgisayarKartlari = kartDagit(tumKartlar);
 
-        // Dağıtılan kartları ekrana yazdıralım
+        // Oyuncu ve Bilgisayar Nesnelerini Oluştur
+        Oyuncu oyuncu = new Oyuncu(1, "Kullanici", 0, oyuncuKartlari);
+        Oyuncu bilgisayar = new Oyuncu(2, "Bilgisayar", 0, bilgisayarKartlari);
+
+        // Kartları yazdır
         System.out.println("Oyuncu Kartları:");
         yazdirKartlar(oyuncuKartlari);
 
         System.out.println("\nBilgisayar Kartları:");
         yazdirKartlar(bilgisayarKartlari);
+
+        // Bilgisayarın kart seçmesi
+        kartSec(bilgisayarKartlari, true);
+
+        // Oyuncunun kart seçmesi
+        kartSec(oyuncuKartlari, false);
+
+        // Skorları göster
+        System.out.println("\nOyuncunun Skoru: " + oyuncu.getSkor());
+        System.out.println("Bilgisayarın Skoru: " + bilgisayar.getSkor());
     }
 
     // Kartları rastgele dağıtan fonksiyon
@@ -48,24 +66,65 @@ public class Oyun {
         return kartlar;
     }
 
-    // Kartları yazdıran fonksiyon (Kartları sıralı olarak yazdıracak)
+    // Kartları yazdıran fonksiyon
     public static void yazdirKartlar(List<SavasAraci> kartlar) {
-        // Kart türlerine göre sayılar ekleyelim
-        int ucakSayisi = 1, sihaSayisi = 1, obusSayisi = 1, kfsSayisi = 1, firkateynSayisi = 1, sidaSayisi = 1;
+        // Kart türlerine göre sayaçları başlat
+        Map<String, Integer> kartSayilari = new HashMap<>();
 
+        // Kart türlerine göre sayıları arttırarak yazdır
         for (SavasAraci kart : kartlar) {
-            if (kart instanceof Ucak) {
-                System.out.println("Ucak" + ucakSayisi++);
-            } else if (kart instanceof Siha) {
-                System.out.println("Siha" + sihaSayisi++);
-            } else if (kart instanceof Obus) {
-                System.out.println("Obus" + obusSayisi++);
-            } else if (kart instanceof KFS) {
-                System.out.println("KFS" + kfsSayisi++);
-            } else if (kart instanceof Firkateyn) {
-                System.out.println("Firkateyn" + firkateynSayisi++);
-            } else if (kart instanceof Sida) {
-                System.out.println("Sida" + sidaSayisi++);
+            String kartTuru = kart.getClass().getSimpleName(); // Kartın türünü al
+
+            // Kart türüne göre sayıyı arttır
+            kartSayilari.put(kartTuru, kartSayilari.getOrDefault(kartTuru, 0) + 1);
+
+            // Kart türü + sayısı yazdır
+            System.out.println(kartTuru + " " + kartSayilari.get(kartTuru));
+        }
+    }
+
+    // Bilgisayar ve Kullanıcı kart seçimi
+    public static void kartSec(List<SavasAraci> kartlar, boolean bilgisayar) {
+        List<SavasAraci> secilenKartlar = new ArrayList<>(); // Seçilen kartları tutacak liste
+        List<SavasAraci> secilecekKartlar = new ArrayList<>(kartlar); // Tüm kartların bir kopyasını alıyoruz
+
+        // Bilgisayar için rastgele kart seçme
+        if (bilgisayar) {
+            Random rand = new Random();
+            for (int i = 0; i < 3; i++) {
+                int index = rand.nextInt(secilecekKartlar.size());
+                secilenKartlar.add(secilecekKartlar.get(index));
+                secilecekKartlar.remove(index); // Seçilen kartı listeden çıkar
+            }
+
+            System.out.println("Bilgisayarın Seçtiği Kartlar:");
+            for (SavasAraci kart : secilenKartlar) {
+                System.out.println("Bilgisayar " + kart.getClass().getSimpleName() + " kartını seçti.");
+            }
+        }
+        // Kullanıcı için kart seçme
+        else {
+            List<String> secilenKartlarStr = new ArrayList<>(); // Kullanıcı tarafından seçilen kartları tutacak liste
+
+            while (secilenKartlarStr.size() < 3) {
+                System.out.println("Kullanici Kart Seçin:");
+                Map<String, Integer> kartNumaralari = new HashMap<>();
+                for (int i = 0; i < secilecekKartlar.size(); i++) {
+                    SavasAraci kart = secilecekKartlar.get(i);
+                    String kartTuru = kart.getClass().getSimpleName();
+                    kartNumaralari.put(kartTuru, kartNumaralari.getOrDefault(kartTuru, 0) + 1);
+                    System.out.println((i + 1) + ". " + kartTuru + " " + kartNumaralari.get(kartTuru)); // Kart türü ve numara
+                }
+
+                // Kullanıcıdan seçim almak
+                Scanner scanner = new Scanner(System.in);
+                int secim = scanner.nextInt() - 1; // Kullanıcıdan gelen seçim
+
+                SavasAraci secilenKart = secilecekKartlar.get(secim);
+                secilenKartlarStr.add(secilenKart.getClass().getSimpleName()); // Seçilen kartı listeye ekle
+                secilecekKartlar.remove(secim); // Seçilen kartı listeden çıkar
+
+                System.out.println("Kullanıcı " + secilenKart.getClass().getSimpleName() + " kartını seçti.");
             }
         }
     }
