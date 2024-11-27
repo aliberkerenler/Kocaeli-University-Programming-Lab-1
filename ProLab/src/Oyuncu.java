@@ -6,6 +6,7 @@ public class Oyuncu {
     private int oyuncuID;
     private String oyuncuAdi;
     private int skor;
+    private int seviyePuani; // Yeni eklenen seviye puanı
     private List<SavasAraci> kartListesi;
 
     // Parametreli Yapıcı
@@ -52,6 +53,13 @@ public class Oyuncu {
             return secilenKart;
         }
     }
+    // Seviye puanı arttırma
+    public void seviyePuaniArtir(int artisim) {
+        this.seviyePuani += artisim;
+        if (this.seviyePuani < 0) {
+            this.seviyePuani = 0; // Negatif seviye puanı olmasın
+        }
+    }
 
     // Getter ve Setter'lar
     public int getOyuncuID() {
@@ -76,6 +84,14 @@ public class Oyuncu {
 
     public void setSkor(int skor) {
         this.skor = skor;
+    }
+
+    public int getSeviyePuani() {
+        return seviyePuani;
+    }
+
+    public void setSeviyePuani(int seviyePuani) {
+        this.seviyePuani = seviyePuani;
     }
 
     public List<SavasAraci> getKartListesi() {
