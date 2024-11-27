@@ -199,7 +199,6 @@ public class Oyun {
             // Kartları kontrol et
             if (bilgisayarKart.getDayaniklilik() <= 0) {
                 bilgisayarKart.setDayaniklilik(0); // Negatif değer sıfıra sabitlenir
-                bilgisayar.kartCikar(bilgisayarKart);
                 oyuncu.setSkor(oyuncu.getSkor() + bilgisayarKart.getSeviyePuani() + 10);
                 System.out.println("Bilgisayarın " + bilgisayarKart.getClass().getSimpleName() + " kartı elendi!");
                 bilgisayarKartlari.remove(i);
