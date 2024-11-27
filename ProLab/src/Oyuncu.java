@@ -24,6 +24,10 @@ public class Oyuncu {
         this.kartListesi = null; // Varsayılan kartListesi
     }
 
+    public void kartCikar(SavasAraci kart) {
+        this.kartListesi.remove(kart);
+    }
+
     // Skor gösterme fonksiyonu
     public void SkorGoster() {
         System.out.println(oyuncuAdi + " Skoru: " + skor);
