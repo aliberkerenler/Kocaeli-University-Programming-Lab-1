@@ -43,7 +43,7 @@ public class Oyun {
         yazdirKartlar(bilgisayarKartlari);
 
         // Oyun Döngüsü
-        while (true) {
+        for (int tur = 1; tur <= 5; tur++) {
             // Bilgisayarın Kart Seçmesi
             List<SavasAraci> bilgisayarSecilenKartlar = bilgisayarKartSec(bilgisayar);
 
@@ -74,18 +74,63 @@ public class Oyun {
             System.out.println("Oyuncu Skoru: " + oyuncu.getSkor());
             System.out.println("Bilgisayar Skoru: " + bilgisayar.getSkor());
 
-            // Oyunu Bitirme Kontrolü
-            if (oyuncu.getSkor() >= 50 || bilgisayar.getSkor() >= 50) {
+            if (tur != 5) {
+                oyuncuKartlari = kartEkle(oyuncuKartlari, oyuncuKartlar);
+                bilgisayarKartlari = kartEkle(bilgisayarKartlari, bilgisayarKartlar);
+            }
+
+            if(oyuncuKartlari.size() < 3){
+                while (oyuncuKartlari.size() < 3){
+                    kartEkle(oyuncuKartlari, oyuncuKartlar);
+                }
+                kartKarsilastir(oyuncuKartlari, bilgisayarKartlari, oyuncu, bilgisayar);
                 System.out.println("\nOyun Bitti!");
                 if (oyuncu.getSkor() > bilgisayar.getSkor()) {
-                    System.out.println("Kazanan: Oyuncu");
-                } else {
-                    System.out.println("Kazanan: Bilgisayar");
+                    System.out.println("Kazanan: Oyuncu!");
+                }
+                if (bilgisayar.getSkor() > oyuncu.getSkor()){
+                    System.out.println("Kazanan: Bilgisayar!");
+                }
+                if (bilgisayar.getSkor() == oyuncu.getSkor()){
+                    System.out.println("Oyun Berabere!");
                 }
                 break;
             }
+
+            if(bilgisayarKartlari.size() < 3){
+                while (bilgisayarKartlari.size() < 3){
+                    bilgisayarKartlari = kartEkle(bilgisayarKartlari, bilgisayarKartlar);
+                }
+                kartKarsilastir(oyuncuKartlari, bilgisayarKartlari, oyuncu, bilgisayar);
+                System.out.println("\nOyun Bitti!");
+                if (oyuncu.getSkor() > bilgisayar.getSkor()) {
+                    System.out.println("Kazanan: Oyuncu!");
+                }
+                if (bilgisayar.getSkor() > oyuncu.getSkor()){
+                    System.out.println("Kazanan: Bilgisayar!");
+                }
+                if (bilgisayar.getSkor() == oyuncu.getSkor()){
+                    System.out.println("Oyun Berabere!");
+                }
+                break;
+            }
+
+            // Oyunu Bitirme Kontrolü
+            if (tur == 5) {
+                System.out.println("\nOyun Bitti!");
+                if (oyuncu.getSkor() > bilgisayar.getSkor()) {
+                    System.out.println("Kazanan: Oyuncu!");
+                }
+                if (bilgisayar.getSkor() > oyuncu.getSkor()){
+                    System.out.println("Kazanan: Bilgisayar!");
+                }
+                if (bilgisayar.getSkor() == oyuncu.getSkor()){
+                    System.out.println("Oyun Berabere!");
+                }
+            }
         }
     }
+
 
     // Kartları rastgele dağıtan fonksiyon
     public static List<SavasAraci> kartDagit(List<SavasAraci> tumKartlar) {
@@ -114,7 +159,7 @@ public class Oyun {
         }
         for (int i = 0; i < 3; i++) {
             Random rand = new Random();
-            SavasAraci secilenKart = aktifKartlar.get(rand.nextInt(kartlar.size()));
+            SavasAraci secilenKart = aktifKartlar.get(rand.nextInt(aktifKartlar.size()));
             kartlar.remove(secilenKart); // Kartı seçtikten sonra listeden çıkar
             aktifKartlar.remove(secilenKart);
             secilenKartlar.add(secilenKart);
@@ -153,6 +198,16 @@ public class Oyun {
         System.out.println("\nKullanıcının Seçtiği Kartlar:");
         yazdirKartlar(secilenKartlar);
         return secilenKartlar;
+    }
+
+    public static List<SavasAraci> kartEkle(List<SavasAraci> kartlar, List<SavasAraci> oyuncuKartlar){
+        Random rand = new Random();
+
+        SavasAraci yeniKart = oyuncuKartlar.get(rand.nextInt(oyuncuKartlar.size()));
+        kartlar.add(yeniKart);
+
+        System.out.println("Yeni Kart Eklendi: " + yeniKart.getClass().getSimpleName());
+        return kartlar;
     }
 
     // Kartları yazdıran fonksiyon
