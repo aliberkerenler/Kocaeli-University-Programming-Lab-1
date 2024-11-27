@@ -1,4 +1,4 @@
-public abstract class SavasAraci {
+public abstract class SavasAraci implements Cloneable{
     private int seviyePuani;
 
     public SavasAraci(int seviyePuani) {
@@ -22,9 +22,18 @@ public abstract class SavasAraci {
         this.seviyePuani = seviyePuani;
     }
     public void kartPuaniGoster() {
-        System.out.println("Dayanýklýlýk: " + getDayaniklilik() + ", Seviye Puaný: " + seviyePuani );
+        System.out.println("Dayanï¿½klï¿½lï¿½k: " + getDayaniklilik() + ", Seviye Puanï¿½: " + seviyePuani );
     }
 
+    @Override
+    public SavasAraci clone() {
+        try {
+            return (SavasAraci) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            return null; // EÄŸer klonlama baÅŸarÄ±sÄ±z olursa
+        }
+    }
     public abstract void DurumGuncelle(int vurus);
 
 }
