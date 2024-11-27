@@ -164,7 +164,7 @@ public class Oyun {
     }
 
     public static void kartKarsilastir(List<SavasAraci> oyuncuKartlari, List<SavasAraci> bilgisayarKartlari, Oyuncu oyuncu, Oyuncu bilgisayar) {
-        for (int i = oyuncuKartlari.size() - 1; i >= 0; i--) {
+        for (int i = 2; i >= 0; i--) {
             SavasAraci oyuncuKart = oyuncuKartlari.get(i);
             SavasAraci bilgisayarKart = bilgisayarKartlari.get(i);
 
@@ -199,6 +199,7 @@ public class Oyun {
             // Kartları kontrol et
             if (bilgisayarKart.getDayaniklilik() <= 0) {
                 bilgisayarKart.setDayaniklilik(0); // Negatif değer sıfıra sabitlenir
+                bilgisayar.kartCikar(bilgisayarKart);
                 oyuncu.setSkor(oyuncu.getSkor() + bilgisayarKart.getSeviyePuani() + 10);
                 System.out.println("Bilgisayarın " + bilgisayarKart.getClass().getSimpleName() + " kartı elendi!");
                 bilgisayarKartlari.remove(i);
@@ -209,6 +210,7 @@ public class Oyun {
 
             if (oyuncuKart.getDayaniklilik() <= 0) {
                 oyuncuKart.setDayaniklilik(0); // Negatif değer sıfıra sabitlenir
+                oyuncu.kartCikar(bilgisayarKart);
                 bilgisayar.setSkor(bilgisayar.getSkor() + oyuncuKart.getSeviyePuani() + 10);
                 System.out.println("Oyuncunun " + oyuncuKart.getClass().getSimpleName() + " kartı elendi!");
                 oyuncuKartlari.remove(i);
