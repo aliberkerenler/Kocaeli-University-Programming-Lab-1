@@ -2,10 +2,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.io.IOException;
+
+
 
 public class Oyun {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        // Dosyaya yazma işlemi için PrintStream oluşturuyoruz
+        FileOutputStream fos = new FileOutputStream("oyun_output.txt"); // Çıktıyı 'oyun_output.txt' dosyasına yazacak
+        PrintStream ps = new PrintStream(fos);
+
+        // Konsola ve dosyaya yazma işlemi için TeeOutputStream kullanıyoruz
+        System.setOut(new PrintStream(new TeeOutputStream(System.out, ps))); // Konsola ve dosyaya yönlendiriyoruz
+
         // Kartları oluşturma
         List<SavasAraci> oyuncuKartlar = new ArrayList<>();
         List<SavasAraci> bilgisayarKartlar = new ArrayList<>();
@@ -79,10 +91,20 @@ public class Oyun {
                 bilgisayarKartlari = kartEkle(bilgisayarKartlari, bilgisayarKartlar);
             }
 
-            if(oyuncuKartlari.size() < 3){
-                while (oyuncuKartlari.size() < 3){
-                    kartEkle(oyuncuKartlari, oyuncuKartlar);
+            // Oyun Bitti Kontrolü
+            if (oyuncuKartlari.size() < 3 || bilgisayarKartlari.size() < 3) {
+                if (oyuncuKartlari.size() < 3) {
+                    while (oyuncuKartlari.size() < 3){
+                        kartEkle(oyuncuKartlari, oyuncuKartlar);
+                    }
                 }
+
+                if (bilgisayarKartlari.size() < 3) {
+                    while (bilgisayarKartlari.size() < 3){
+                        kartEkle(bilgisayarKartlari, bilgisayarKartlar);
+                    }
+                }
+
                 kartKarsilastir(oyuncuKartlari, bilgisayarKartlari, oyuncu, bilgisayar);
                 System.out.println("\nOyun Bitti!");
                 if (oyuncu.getSkor() > bilgisayar.getSkor()) {
@@ -97,25 +119,7 @@ public class Oyun {
                 break;
             }
 
-            if(bilgisayarKartlari.size() < 3){
-                while (bilgisayarKartlari.size() < 3){
-                    bilgisayarKartlari = kartEkle(bilgisayarKartlari, bilgisayarKartlar);
-                }
-                kartKarsilastir(oyuncuKartlari, bilgisayarKartlari, oyuncu, bilgisayar);
-                System.out.println("\nOyun Bitti!");
-                if (oyuncu.getSkor() > bilgisayar.getSkor()) {
-                    System.out.println("Kazanan: Oyuncu!");
-                }
-                if (bilgisayar.getSkor() > oyuncu.getSkor()){
-                    System.out.println("Kazanan: Bilgisayar!");
-                }
-                if (bilgisayar.getSkor() == oyuncu.getSkor()){
-                    System.out.println("Oyun Berabere!");
-                }
-                break;
-            }
-
-            // Oyunu Bitirme Kontrolü
+            // Oyun Bitti Kontrolü
             if (tur == 5) {
                 System.out.println("\nOyun Bitti!");
                 if (oyuncu.getSkor() > bilgisayar.getSkor()) {
@@ -132,7 +136,10 @@ public class Oyun {
     }
 
 
-    // Kartları rastgele dağıtan fonksiyon
+
+
+
+        // Kartları rastgele dağıtan fonksiyon
     public static List<SavasAraci> kartDagit(List<SavasAraci> tumKartlar) {
         List<SavasAraci> kartlar = new ArrayList<>();
         Random rand = new Random();
