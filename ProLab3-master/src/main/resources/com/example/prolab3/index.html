@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yazarlar Arası İşbirliği</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        #chart {
+            width: 80%;
+            margin: auto;
+            height: 400px;
+        }
+        .chart-container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+        .description {
+            margin: 20px 0;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<h1>Yazarlar Arası İşbirliği Grafiği</h1>
+<p class="description">
+    Bu grafik, yazarlar arasındaki ortak makale sayısını görselleştirmektedir.
+    Grafik, her yazar için ortak makale sayısını bar olarak göstermektedir.
+</p>
+<div class="chart-container">
+    <canvas id="chart"></canvas>
+</div>
+
+<!-- Chart.js Kütüphanesi -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Yazarlar ve ortak makale sayıları (örnek veriler)
+    const chartData = {
+        labels: ['Yazar 1', 'Yazar 2', 'Yazar 3', 'Yazar 4', 'Yazar 5'],
+        datasets: [{
+            label: 'Ortak Makale Sayısı',
+            data: [10, 5, 8, 12, 3], // Her yazar için ortak makale sayısı
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderWidth: 1
+        }]
+    };
+
+    const config = {
+        type: 'bar',
+        data: chartData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return 'Ortak Makale Sayısı: ' + tooltipItem.raw;
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    var ctx = document.getElementById('chart').getContext('2d');
+    var myChart = new Chart(ctx, config);
+</script>
+</body>
+</html>
