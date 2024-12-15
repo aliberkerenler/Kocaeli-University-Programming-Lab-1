@@ -1,0 +1,579 @@
+[33mcommit 43494838e6e3ed76cc57d5763d5f486885606f63[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Fri Dec 13 20:43:10 2024 +0300
+
+    Add files via upload
+
+[33mcommit 2f70d1900021ae0c49fe0c358e947ce30c7ba249[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sun Dec 1 16:54:05 2024 +0300
+
+    Delete Card Game/savas_sim.txt
+
+[33mcommit f637e3e2731d4979b819b43c62c95f4ca05d47cc[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sun Dec 1 16:53:48 2024 +0300
+
+    Rename ProLab.iml to CardGame.iml
+
+[33mcommit 03ff60718bc584e3a6ca6fb7a7b3dc0a960c83f5[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sun Dec 1 16:53:21 2024 +0300
+
+    Delete Card Game/out/production/ProLab directory
+
+[33mcommit 3c84be7f567cceb944466e2e7538e72907e3c52a[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sun Dec 1 16:52:35 2024 +0300
+
+    Add files via upload
+
+[33mcommit 5d49a1504993d10ce0099a2091efe6580a9f4011[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sun Dec 1 16:48:13 2024 +0300
+
+    Add files via upload
+
+[33mcommit 855d8d47a6f697c4a196114091778e48afab0ad9[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sun Dec 1 15:53:32 2024 +0300
+
+    Update Oyun.java
+
+[33mcommit 591338df8d5ec7720d02b8909fa4134630e01c57[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Sat Nov 30 17:08:00 2024 +0300
+
+    TeeOutputStream.java
+
+[33mcommit 4d04049b000ca521d170ea899e0e20d23c8c7ac5[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Sat Nov 30 17:06:16 2024 +0300
+
+    Oyun.java
+
+[33mcommit 94c43d633660afca9f5ef4b6f4ad466f069f30f5[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Thu Nov 28 00:10:46 2024 +0300
+
+    Update Oyun.java
+
+[33mcommit bc9105810ddbe6e0b09f433ce437c3b2a146a8b8[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Thu Nov 28 00:10:16 2024 +0300
+
+    Update Oyun.java
+
+[33mcommit c99c3606c06d06eb29c51fc8a6fc3767634bd220[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 27 23:09:22 2024 +0300
+
+    Update Oyuncu.java
+
+[33mcommit 2ee026cb1544b30456acbe1ac280b9e7cce81d4e[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 27 23:08:58 2024 +0300
+
+    Update Oyun.java
+
+[33mcommit 2804c54b8afd698726df182f689f78fc80c5b77a[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 27 23:08:39 2024 +0300
+
+    Update Oyun.java
+
+[33mcommit 7aaa76b32fd8876ad4ee713037c9838eb80ebc13[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 27 22:59:00 2024 +0300
+
+    Update Oyun.java
+
+[33mcommit 18b8fe5a2eccd2e6113ca3ab385f951431ab00e1[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 27 22:57:12 2024 +0300
+
+    Update Oyuncu.java
+
+[33mcommit 8a70947ccbd6888b76e5c4df9639ba2ff540b61b[m
+Author: aliberkerenler <aliberkerenler@gmail.com>
+Date:   Wed Nov 27 22:57:41 2024 +0300
+
+    done
+
+[33mcommit d60f211c5f92affc1cb9d7217dc49f8ca0f1177e[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Wed Nov 27 20:57:38 2024 +0300
+
+    Oyuncu.java
+
+[33mcommit d5ec8fa6304e9c6ae684159f078b926b4c46fc55[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Wed Nov 27 20:57:13 2024 +0300
+
+    Oyun.java
+
+[33mcommit 07f11a766545c493ded59725e4eab5bd3dd9f3a9[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Wed Nov 27 20:51:18 2024 +0300
+
+    Oyun.java
+
+[33mcommit 715bcd0fab0f29742e6ba5226321672d97caff65[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Sat Nov 16 22:29:55 2024 +0300
+
+    Oyun.java
+
+[33mcommit 23ee3665d8330c8f367e7c32361291f7ae68f090[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Fri Nov 15 23:02:06 2024 +0300
+
+    Oyuncu.java
+
+[33mcommit 042c1987035ecb0e9e122608a1b8f5f5d88f6dfb[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Fri Nov 15 23:01:30 2024 +0300
+
+    Oyun.java
+
+[33mcommit 9828d78e089b452e2720876b29e18a67ec79f695[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Thu Nov 14 22:33:54 2024 +0300
+
+    Ucak.java
+
+[33mcommit 4d7125c0ccf5338b379fd1b465d07360e6828de7[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Thu Nov 14 22:33:25 2024 +0300
+
+    Siha.java
+
+[33mcommit 5292b0271010322736e2f53275bfcf2f57e2eb99[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Thu Nov 14 22:33:07 2024 +0300
+
+    Sida.java
+
+[33mcommit 682690565ea0726245f4e7821c3643eda5cf0dfb[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Thu Nov 14 22:32:20 2024 +0300
+
+    Obus.java
+
+[33mcommit 1941d514a8374b2343730739c4c733c53e625d8b[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Thu Nov 14 22:29:52 2024 +0300
+
+    KFS.java
+
+[33mcommit a7092f1f21c700e7960f4a05004e1b709f5e69c3[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Thu Nov 14 22:28:58 2024 +0300
+
+    Firkateyn.java
+
+[33mcommit a2c385843768f13807890cd1f342cc9bd5151af6[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Thu Nov 14 22:09:18 2024 +0300
+
+    Oyun.java
+
+[33mcommit 29b99bf6d1722a05efb90c9418cde9b17449566f[m
+Author: Omercan06 <omer06ogutlu34@gmail.com>
+Date:   Wed Nov 13 23:39:59 2024 +0300
+
+    Add files via upload
+
+[33mcommit 8658c4263220cc37465479ee4f9c9827add62534[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 13 23:36:20 2024 +0300
+
+    Delete Files directory
+
+[33mcommit 4e6d546403dfe41b32a9748819a282203830e17b[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 13 23:36:08 2024 +0300
+
+    Add files via upload
+
+[33mcommit 3baa9b128ae599ebdcd1630105364ec1e415e64e[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 13 23:28:06 2024 +0300
+
+    Add files via upload
+
+[33mcommit e9e8e7f3356b0d966a1801abb7b348bcb2901e6e[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 13 23:27:40 2024 +0300
+
+    Delete 230202069_230202040.pdf
+
+[33mcommit 71631023210315f4f4590c5c7ce0a74d15d161d2[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 13 23:26:53 2024 +0300
+
+    Delete gonderelim_artik.c
+
+[33mcommit 942fac6dca4628f70663e6d6754c20717147d288[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 13 23:26:41 2024 +0300
+
+    Delete lastupdated.c
+
+[33mcommit 877a9355f72d68895da40d6518bfc72d1c3d9567[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 13 23:26:33 2024 +0300
+
+    Delete main1.c
+
+[33mcommit 8030f26d8dd0438dd3d5c7315ddd9f93acb929f9[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 13 23:26:08 2024 +0300
+
+    Delete Codes directory
+
+[33mcommit 97dc5aed599b0e83ee42a87a12cf4956e0f2dcf0[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Nov 13 23:25:53 2024 +0300
+
+    Create main.c
+
+[33mcommit dac9c64c4f1c3e741589bcb44e77579a1a67f5d9[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Fri Oct 25 03:44:00 2024 +0300
+
+    lastupdated.c
+
+[33mcommit 72febad9955a36aa2063b757bdd9f1a459c0b79d[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Fri Oct 25 03:08:46 2024 +0300
+
+    Add files via upload
+
+[33mcommit d129b5c604dcf6711322eff235f29bfe20e30545[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Fri Oct 25 03:07:53 2024 +0300
+
+    Delete 230202069-230202040.pdf
+
+[33mcommit aafd86acf2c9566b32568aaaa3001333e52d0c50[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Fri Oct 25 02:09:32 2024 +0300
+
+    Update gonderelim_artik.c
+
+[33mcommit 314f21a436fdcea2ab2bbaf4509d512fe7a6c34a[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Fri Oct 25 02:04:23 2024 +0300
+
+    Update gonderelim_artik.c
+
+[33mcommit 5de5f24ceb17549ea849e28f62dc05e99fe2af29[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Fri Oct 25 01:58:10 2024 +0300
+
+    lastupdated.c
+
+[33mcommit f05ecf7026b81701ce21f0bcb4b56e66a045f5b0[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Fri Oct 25 01:49:33 2024 +0300
+
+    Update gonderelim_artik.c
+
+[33mcommit c3054519466edd62b77da2ac76743e5c9938b807[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Fri Oct 25 01:24:27 2024 +0300
+
+    Update gonderelim_artik.c
+
+[33mcommit dda59ea9da2012dff7a5e14684a366180779d644[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Fri Oct 25 01:23:00 2024 +0300
+
+    Create gonderelim_artik.c
+
+[33mcommit acda5538faa9d47cb7ac817fe3ee178fa3610e9f[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Thu Oct 24 18:45:06 2024 +0300
+
+    Add files via upload
+
+[33mcommit 3716bad31d14bcb4cf9ddf33e7d7b564d75a2f34[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Thu Oct 24 18:34:42 2024 +0300
+
+    main1.c
+
+[33mcommit 0d3c70a435655f72c8effaece0a1df92565c809e[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Thu Oct 24 14:41:44 2024 +0300
+
+    main1.c
+
+[33mcommit d3281b74751b4d5ab2aa945d8d6b7c43e19683ea[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Thu Oct 24 02:54:15 2024 +0300
+
+    lastupdated.c
+
+[33mcommit a23503e2666ba37ced205702a57e2ea27db0c35e[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Thu Oct 24 02:53:27 2024 +0300
+
+    main1.c
+
+[33mcommit 18beb9c1aafe8800339858f526518aef223aef06[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Wed Oct 23 22:43:03 2024 +0300
+
+    Update main1.c
+
+[33mcommit c44d0957c8b24ba8d3f377d3f5a68a83aa3425d6[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Wed Oct 23 22:05:00 2024 +0300
+
+    main1.c
+
+[33mcommit 50da6e60393984376c490a72fff7aeb8b90eabd1[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 23:18:28 2024 +0300
+
+    Update main.c
+
+[33mcommit b255b2e66460957854b2771b8cba40a29c8ef3cd[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 23:17:48 2024 +0300
+
+    Update main.c
+
+[33mcommit 085d3928601f1d8db5239af5b2cc85b57444b274[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 02:00:59 2024 +0300
+
+    Delete yeni main.c
+
+[33mcommit 94d10711f3ee7212b46d7586a0e16a2d225fda1f[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 02:00:51 2024 +0300
+
+    Delete update.c
+
+[33mcommit 3b087106654c7b5f097b68257125adae17d5c00a[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 02:00:44 2024 +0300
+
+    Delete prototype code
+
+[33mcommit ab1f015ad7f06f1558da5c725bee1b15d8be32bf[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 02:00:34 2024 +0300
+
+    Delete main.c
+
+[33mcommit 5b8706e2d82814dbf99f32fa7ac7e9bc4086ab0b[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 02:00:27 2024 +0300
+
+    Delete live_share_link
+
+[33mcommit c9adf3f2ee3b82b615c66b53999c470766615450[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 02:00:20 2024 +0300
+
+    Delete kritikli_dosya
+
+[33mcommit fce3f0bf68f5b9d43456768b577f0bec9d1a1208[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 02:00:10 2024 +0300
+
+    Delete kritik.c
+
+[33mcommit 2807c2463c1fbd6112d53e561c43f76b90e68a12[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 02:00:02 2024 +0300
+
+    Delete Proje1.c
+
+[33mcommit b76518d9c7321b9e4e3b18a96c744ebb59f7513e[m
+Author: aliberkerenler <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 01:59:01 2024 +0300
+
+    done
+
+[33mcommit e26e2e1282972dc4ee36e261c940eed6c33782da[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 01:52:38 2024 +0300
+
+    Update savas_adim_adim.c
+
+[33mcommit ea73935c207b2e7db8c83548f1e8bca72917ca04[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 01:52:24 2024 +0300
+
+    Delete Codes/saglik_hesapla.c
+
+[33mcommit a14c0cb77ef8e832209f3adb3b33917440b1a416[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 01:51:41 2024 +0300
+
+    Update ork_saglik_hesapla.c
+
+[33mcommit 9051503ce5f501435729642db75716349f7c47d2[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 01:51:13 2024 +0300
+
+    Update kritik_vurus_hesapla.c
+
+[33mcommit 81d440878b3cfe64a24d320d503eeb8e19c4d6c3[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 01:50:51 2024 +0300
+
+    Update insan_saglik_hesapla.c
+
+[33mcommit 8bf62da89c9e33b44ae2f13046f61060992aec55[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 22 01:45:26 2024 +0300
+
+    Update main.c
+
+[33mcommit 365982d54f50b95698a9c2e3d4b7a48395e0bc55[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Sun Oct 20 22:58:31 2024 +0300
+
+    main.c
+
+[33mcommit ccdf2239d59b32e1c8cd57b015f3fcdfe2579608[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sun Oct 20 22:48:39 2024 +0300
+
+    Update main.c
+
+[33mcommit bac60e48c71f7cea1325e7b09c79e474ed063edf[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sat Oct 19 17:37:08 2024 +0300
+
+    Add files via upload
+
+[33mcommit a1544e878cf0f287be909acccb569aceabbf0538[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sat Oct 19 17:35:59 2024 +0300
+
+    Update saldiri_gucu_hesapla.c
+
+[33mcommit 2fdd615d6625f16ac0731feb00d26cb786b201dd[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sat Oct 19 17:35:26 2024 +0300
+
+    Create savas_adim_adim.c
+
+[33mcommit 2bcc1b651980502666b243ad1b0208cb6355871f[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sat Oct 19 17:32:31 2024 +0300
+
+    Update main.c
+
+[33mcommit 4fb5d340994485a9186c784fd812b0fead66990e[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Sat Oct 19 16:29:30 2024 +0300
+
+    kritikli_dosya
+
+[33mcommit b3642775ddf4ab35e898844252c678721b7940a5[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Sat Oct 19 15:09:06 2024 +0300
+
+    Create kritik.c
+
+[33mcommit bc93bc0a956cb94e3872bcb2a40036b8ced50536[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sat Oct 19 15:07:04 2024 +0300
+
+    Create yeni main.c
+
+[33mcommit bdf7f29f0b6c0c24093cad968e14d525d495412a[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sat Oct 19 14:05:43 2024 +0300
+
+    Update main.c
+
+[33mcommit eb301a686285de19ecd455b763fe02fbf32f6c9a[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Sat Oct 19 14:04:53 2024 +0300
+
+    Update read_ork_scenario.c
+
+[33mcommit 0ee3bb2d057ff8293b3110afbf2807cd46030cc1[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Sat Oct 19 00:43:27 2024 +0300
+
+    update.c
+
+[33mcommit 865753d53e654593aad8cb07ac26266ea06b3ddb[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Fri Oct 18 23:22:51 2024 +0300
+
+    main.c
+
+[33mcommit a566901262b2e9a8f132be30ec87cd9e6fb335df[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Fri Oct 18 22:51:31 2024 +0300
+
+     main.c
+
+[33mcommit d25a2331f43a1cd94a93d6048685d03b60ce2e24[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Thu Oct 17 01:33:58 2024 +0300
+
+    Add files via upload
+
+[33mcommit 2d399d65b0a69ca41f8a780a51f4dd0fa1191992[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Thu Oct 17 01:32:38 2024 +0300
+
+    Update main.c
+
+[33mcommit 6893fa8c2136eed7b23640f5cb4382a6a87f07c4[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Wed Oct 16 22:15:38 2024 +0300
+
+    Create Proje1.c
+
+[33mcommit dab7042c76ecac1c0bf13544d76da44d4bbe63db[m
+Author: omertoycu <155885596+omertoycu@users.noreply.github.com>
+Date:   Tue Oct 15 18:24:00 2024 +0300
+
+    Create main.c
+
+[33mcommit 0e150ddc3268422ed9e6e43810bcdeb7302c93db[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 15 01:33:43 2024 +0300
+
+    Add files via upload
+
+[33mcommit 0d1bcd01f75df27dcfdf5f745e9e88f522d1ce50[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 15 01:33:16 2024 +0300
+
+    Update main.c
+
+[33mcommit 8ed2443f5fa6e5891fb4410a2299513eca903413[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Tue Oct 15 01:32:44 2024 +0300
+
+    Delete Codes/parse_creature_json.c
+
+[33mcommit 62c51a5246f707cb6dee1fe3a13b4d469c350eb7[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Mon Oct 14 01:28:59 2024 +0300
+
+    Update main.c
+
+[33mcommit 9bc3759c43f95d57fa67712ef251c7c858daf6aa[m
+Author: Berke <aliberkerenler@gmail.com>
+Date:   Mon Oct 14 01:28:39 2024 +0300
+
+    Update parse_scenario_json.c
+
+[33mcommit 746c768e7adb422bfdb7b65d388be056bc7ec7ab[m
+Author: aliberkerenler <aliberkerenler@gmail.com>
+Date:   Sun Oct 13 00:16
