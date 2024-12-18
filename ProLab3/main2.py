@@ -1,110 +1,106 @@
 import pandas as pd
 from pyvis.network import Network
-from collections import defaultdict
-import webbrowser
+import ast  # String'i listeye dönüştürmek için kullanılacak
 
 
 # Excel'den veri okuma
 def read_excel_data(file_path):
     df = pd.read_excel(file_path)
-    return df[['paper_title', 'coauthors']]
+    required_columns = ['orcid', 'doi', 'author_position', 'author_name', 'coauthors', 'paper_title']
+    for col in required_columns:
+        if col not in df.columns:
+            raise ValueError(f"Excel dosyasında '{col}' sütunu eksik!")
+    return df[required_columns]
 
 
-# Graf oluşturma
-def create_graph(data):
-    graph = Network(
-        height="1000px", width="100%", bgcolor="#ffffff", font_color="#333333", notebook=False
-    )
+# Node ve Edge yapılarını manuel olarak oluşturma
+def create_manual_graph(data):
+    nodes = {}  # Anahtar: node_id, Değer: Node bilgileri
+    edges = []  # Kenarları (source, target) çiftleri olarak saklayacağız.
 
-    author_papers = defaultdict(list)
-    coauthorship = defaultdict(int)
-
-    # Veriyi düğümler ve kenarlara ayırma
     for _, row in data.iterrows():
-        title = row['paper_title']
-        coauthors = [author.strip() for author in row['coauthors'].split(',')]
+        author = row['author_name'].strip()
+        orcid = row['orcid']
+        paper_title = row['paper_title']
+        doi = row['doi']
+        position = row['author_position']
 
-        for author in coauthors:
-            author_papers[author].append(title)
+        try:
+            coauthors = ast.literal_eval(row['coauthors'])  # Coauthors listesini parse et
+        except (ValueError, SyntaxError):
+            coauthors = []
 
-        for i in range(len(coauthors)):
-            for j in range(i + 1, len(coauthors)):
-                pair = tuple(sorted([coauthors[i], coauthors[j]]))
-                coauthorship[pair] += 1
+        coauthors = [coauthor.strip() for coauthor in coauthors]
+
+        # Ana yazarı coauthors listesinden kaldır
+        if 1 <= position <= len(coauthors):
+            position -= 1  # 1 tabanlıyı 0 tabanlıya dönüştür
+            main_author_in_coauthors = coauthors[position]
+            coauthors.remove(main_author_in_coauthors)
+
+        # Ana yazar düğümünü ekleme
+        node_id = f"{author}-{orcid}"
+        if node_id not in nodes:
+            nodes[node_id] = {
+                "label": author,
+                "orcid": orcid,
+                "paper_title": paper_title,
+                "doi": doi,
+                "color": "orange"
+            }
+
+        # Yardımcı yazar düğümleri ve kenarları ekleme
+        for coauthor in coauthors:
+            if not coauthor:  # Boş yazar ismini atla
+                continue
+            coauthor_id = coauthor
+            if coauthor_id not in nodes:
+                nodes[coauthor_id] = {
+                    "label": coauthor,
+                    "orcid": "N/A",
+                    "paper_title": "N/A",
+                    "doi": "N/A",
+                    "color": "lightblue"
+                }
+            # Ana yazar ile yardımcı yazar arasında kenar ekleme
+            edges.append((node_id, coauthor_id))
+
+    return nodes, edges
+
+
+# Pyvis kullanarak grafı görselleştirme
+def visualize_graph(nodes, edges, output_file="manual_graph_visualization.html"):
+    graph = Network(height="800px", width="100%", bgcolor="#222222", font_color="white")
 
     # Düğümleri ekleme
-    for author, papers in author_papers.items():
+    for node_id, node_data in nodes.items():
         graph.add_node(
-            author,
-            label=author,
-            title=f"<b>{author}</b><br>Makaleler:<br>" + "<br>".join(papers),
-            value=len(papers),
-            color="#6DAEDB",  # Düğüm rengi
+            node_id,
+            label=node_data['label'],
+            title=f"""
+                <b>Yazar:</b> {node_data['label']}<br>
+                <b>ORCID:</b> {node_data['orcid']}<br>
+                <b>Makale Başlığı:</b> {node_data['paper_title']}<br>
+                <b>DOI:</b> {node_data['doi']}
+            """,
+            color=node_data['color']
         )
 
     # Kenarları ekleme
-    for (author1, author2), weight in coauthorship.items():
-        graph.add_edge(author1, author2, value=weight, width=1, color="rgba(150,150,150,0.5)")
+    for source, target in edges:
+        graph.add_edge(source, target, color="gray")
 
-    return graph
-
-
-# Fiziksel parametreler ve düğüm stilini iyileştir
-def configure_graph(graph):
+    # Grafı görselleştir
     graph.toggle_physics(True)
-    graph.set_options("""
-        var options = {
-          "physics": {
-            "enabled": true,
-            "barnesHut": {
-              "gravitationalConstant": -8000,
-              "centralGravity": 0.01,
-              "springLength": 250,
-              "springConstant": 0.05,
-              "damping": 0.09
-            },
-            "minVelocity": 0.1
-          },
-          "edges": {
-            "color": {"inherit": false},
-            "smooth": {
-              "type": "continuous"
-            }
-          },
-          "nodes": {
-            "shape": "dot",
-            "scaling": {
-              "min": 10,
-              "max": 80
-            },
-            "font": {
-              "size": 14,
-              "face": "arial",
-              "color": "#343434"
-            }
-          }
-        }
-    """)
-
-
-# Grafi tarayıcıda açma
-def visualize_graph(graph, output_file="graph_visualization.html"):
-    graph.show(output_file,notebook=False)
-    print(f"Grafik görselleştirmesi oluşturuldu: {output_file}")
-    webbrowser.open(output_file)
+    graph.show(output_file, notebook=False)
 
 
 # Ana işlem
 def main():
     excel_file = "dataset.xlsx"  # Excel dosyasının yolu
     data = read_excel_data(excel_file)
-
-    # Grafı oluştur ve yapılandır
-    graph = create_graph(data)
-    configure_graph(graph)
-
-    # Görselleştir ve aç
-    visualize_graph(graph)
+    nodes, edges = create_manual_graph(data)
+    visualize_graph(nodes, edges)
 
 
 if __name__ == "__main__":
