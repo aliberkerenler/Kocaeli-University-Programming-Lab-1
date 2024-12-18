@@ -1,133 +1,125 @@
 import pandas as pd
 from pyvis.network import Network
-from collections import defaultdict
-import webbrowser  # Tarayıcıda açmak için gerekli kütüphane
+import ast  # String'i listeye dönüştürmek için kullanılacak
 
 
 # Excel'den veri okuma
 def read_excel_data(file_path):
     df = pd.read_excel(file_path)
-    return df[['paper_title', 'coauthors']]
+    required_columns = ['orcid', 'doi', 'author_position', 'author_name', 'coauthors', 'paper_title']
+    for col in required_columns:
+        if col not in df.columns:
+            raise ValueError(f"Excel dosyasında '{col}' sütunu eksik!")
+    return df[required_columns]
 
 
-# Graf oluşturma
-def create_graph(data):
-    graph = Network(
-        height="800px", width="100%", bgcolor="#222222", font_color="white", notebook=False
+# Node ve Edge yapılarını manuel olarak oluşturma
+def create_manual_graph(data):
+    nodes = {}  # Anahtar: node_id, Değer: Node bilgileri
+    edges = []  # Kenarları (source, target) çiftleri olarak saklayacağız.
+    main_authors = set()  # Ana düğümleri saymak için bir küme
+
+    for _, row in data.iterrows():
+        author = row['author_name'].strip()
+        orcid = row['orcid']
+        paper_title = row['paper_title']
+        doi = row['doi']
+        position = row['author_position']
+
+        try:
+            coauthors = ast.literal_eval(row['coauthors'])  # Coauthors listesini parse et
+        except (ValueError, SyntaxError):
+            coauthors = []
+
+        coauthors = [coauthor.strip() for coauthor in coauthors]
+
+        # Ana yazarı coauthors listesinden kaldır
+        if 1 <= position <= len(coauthors):
+            position -= 1  # 1 tabanlıyı 0 tabanlıya dönüştür
+            main_author_in_coauthors = coauthors[position]
+            coauthors.remove(main_author_in_coauthors)
+
+        # Ana yazar düğümünü ekleme
+        node_id = f"{author}-{orcid}"
+        if node_id not in nodes:
+            nodes[node_id] = {
+                "label": author,
+                "orcid": orcid,
+                "paper_title": paper_title,
+                "doi": doi,
+                "color": "orange"
+            }
+            main_authors.add(node_id)  # Ana düğümü ana yazar olarak kaydet
+
+        # Yardımcı yazar düğümleri ve kenarları ekleme
+        for coauthor in coauthors:
+            if not coauthor:  # Boş yazar ismini atla
+                continue
+            coauthor_id = coauthor
+            if coauthor_id not in nodes:
+                nodes[coauthor_id] = {
+                    "label": coauthor,
+                    "orcid": "N/A",
+                    "paper_title": "N/A",
+                    "doi": "N/A",
+                    "color": "lightblue"
+                }
+            # Ana yazar ile yardımcı yazar arasında kenar ekleme
+            edges.append((node_id, coauthor_id))
+
+    return nodes, edges, main_authors
+
+
+# Pyvis kullanarak grafı görselleştirme
+def visualize_graph(nodes, edges, output_file="manual_graph_visualization.html"):
+    graph = Network(height="800px", width="100%", bgcolor="#222222", font_color="white")
+
+    # Daha ferah bir görünüm için fiziksel parametreler
+    graph.force_atlas_2based(
+        gravity=-50,  # Çekim kuvvetini azaltır
+        central_gravity=0.005,  # Merkeze çekim kuvveti
+        spring_length=250,  # Kenar uzunluklarını artırır
+        spring_strength=0.01,  # Kenar kuvvetini hafifletir
+        damping=0.9  # Hareketleri daha akıcı hale getirir
     )
 
-    author_papers = defaultdict(list)  # Her yazarın katıldığı makaleler
-    coauthorship = defaultdict(int)  # Yazarlar arası ortaklık sayısı
-
-    # Düğümleri ve kenarları işleme
-    for _, row in data.iterrows():
-        title = row['paper_title']
-        coauthors = [author.strip() for author in row['coauthors'].split(',')]
-
-        # Her yazarın makalesini sakla
-        for author in coauthors:
-            author_papers[author].append(title)
-
-        # Yazarlar arasında kenarları oluştur
-        for i in range(len(coauthors)):
-            for j in range(i + 1, len(coauthors)):
-                pair = tuple(sorted([coauthors[i], coauthors[j]]))
-                coauthorship[pair] += 1
-
-    # Tüm düğümleri ekleme
-    for author, papers in author_papers.items():
+    # Düğümleri ekleme
+    for node_id, node_data in nodes.items():
         graph.add_node(
-            author,
-            label=author,
-            title=f"<b>{author}</b><br>Makaleler:<br>" + "<br>".join(papers),
-            value=len(papers)  # Düğüm boyutunu makale sayısına göre ayarla
+            node_id,
+            label=node_data['label'],
+            title=f"""
+                <b>Yazar:</b> {node_data['label']}<br>
+                <b>ORCID:</b> {node_data['orcid']}<br>
+                <b>Makale Başlığı:</b> {node_data['paper_title']}<br>
+                <b>DOI:</b> {node_data['doi']}
+            """,
+            color=node_data['color']
         )
 
     # Kenarları ekleme
-    for (author1, author2), weight in coauthorship.items():
-        if weight > 1:  # En az 2 ortak makalesi olan kenarlar gösterilsin
-            graph.add_edge(author1, author2, value=weight, title=f"Ortak Makale Sayısı: {weight}")
+    for source, target in edges:
+        graph.add_edge(source, target, color="gray")
 
-    return graph, author_papers
-
-
-# Ortalama makale sayısına göre düğüm stilini güncelleme
-def update_node_styles(graph, author_papers):
-    paper_counts = [len(papers) for papers in author_papers.values()]
-    avg_paper_count = sum(paper_counts) / len(paper_counts) if paper_counts else 0
-
-    for node in graph.nodes:
-        paper_count = node['value']
-        if paper_count > avg_paper_count * 1.2:  # %20 üzerinde
-            node['color'] = 'darkred'
-            node['size'] = 100
-        elif paper_count < avg_paper_count * 0.8:  # %20 altında
-            node['color'] = 'lightblue'
-            node['size'] = 50
-        else:
-            node['color'] = 'orange'
-            node['size'] = 70
-
-
-# Graf görselleştirme ve tarayıcıda açma
-def visualize_graph(graph, output_file="graph_visualization.html"):
-    # Grafik fiziksel simülasyonu başlat ve düzenlemeyi aktif et
+    # Grafı görselleştir
     graph.toggle_physics(True)
-
-    # Physics için parametre ayarları
-    graph.set_options("""
-        var options = {
-            "physics": {
-                "enabled": true,
-                "barnesHut": {
-                    "gravitationalConstant": -10000,
-                    "centralGravity": 0.0001,
-                    "springLength": 5000,
-                    "springConstant": 0.0001,
-                    "damping": 0.09
-                },
-                "minVelocity": 0.75
-            },
-            "nodes": {
-                "shape": "dot",
-                "size": 70
-            },
-            "edges": {
-                "color": "#ffffff",
-                "smooth": {
-                    "type": "continuous",
-                    "forceDirection": "none"
-                }
-            }
-        }
-    """)
-
-    # HTML içeriği oluştur
-    html_content = graph.generate_html(notebook=False)
-
-    # HTML dosyasını kaydet
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write(html_content)
-
-    print(f"Grafik görselleştirmesi oluşturuldu: {output_file}")
-
-    # Tarayıcıda aç
-    webbrowser.open(output_file)
+    graph.show(output_file, notebook=False)
 
 
 # Ana işlem
 def main():
-    excel_file = "dataset.xlsx"  # Excel dosyasının yolunu buraya yazın
+    excel_file = "dataset.xlsx"  # Excel dosyasının yolu
     data = read_excel_data(excel_file)
+    nodes, edges, main_authors = create_manual_graph(data)
 
-    # Grafı oluştur ve yazarları al
-    graph, author_papers = create_graph(data)
+    # Toplam sayıları yazdır
+    print("Graf Bilgileri:")
+    print(f"Toplam Ana Düğüm Sayısı: {len(main_authors)}")
+    print(f"Toplam Düğüm Sayısı: {len(nodes)}")
+    print(f"Toplam Kenar Sayısı: {len(edges)}")
 
-    # Düğüm stilini güncelle
-    update_node_styles(graph, author_papers)
-
-    # Grafi görselleştir ve tarayıcıda aç
-    visualize_graph(graph)
+    # Grafı görselleştir
+    visualize_graph(nodes, edges)
 
 
 if __name__ == "__main__":
