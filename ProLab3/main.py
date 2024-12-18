@@ -13,12 +13,35 @@ def read_excel_data(file_path):
     return df[required_columns]
 
 
+# Tüm yazarların toplam makale sayısını hesaplama
+def calculate_author_total_papers(data):
+    author_total_papers = {}
+
+    for _, row in data.iterrows():
+        try:
+            coauthors = ast.literal_eval(row['coauthors'])  # Coauthors listesini parse et
+        except (ValueError, SyntaxError):
+            coauthors = []
+
+        coauthors = [coauthor.strip() for coauthor in coauthors if coauthor]  # Boş alanları temizle
+        main_author = row['author_name'].strip()  # Ana yazarın ismi
+
+        # Tüm yazarları bir araya getir (ana yazar + yardımcı yazarlar)
+        all_authors = set(coauthors)
+        all_authors.add(main_author)
+
+        # Her yazar için toplam makale sayısını artır
+        for author in all_authors:
+            author_total_papers[author] = author_total_papers.get(author, 0) + 1
+
+    return author_total_papers
+
+
 # Node ve Edge yapılarını manuel olarak oluşturma
 def create_manual_graph(data):
     nodes = {}  # Anahtar: node_id, Değer: Node bilgileri
     edges = {}  # Kenarları (source, target) çiftleri olarak saklayacağız.
     main_authors = set()  # Ana düğüm yazarlarını saklamak için
-    author_paper_count = {}  # Her yazarın makale sayısını tutacağız
 
     for _, row in data.iterrows():
         author = row['author_name'].strip()
@@ -46,16 +69,13 @@ def create_manual_graph(data):
             nodes[node_id] = {
                 "label": author,
                 "orcid": orcid,
-                "paper_title": paper_title,
-                "doi": doi,
-                "papers": set(),
+                "papers": {},  # Yer aldığı makaleler için bir dictionary: {doi: paper_title}
                 "color": "orange"
             }
             main_authors.add(node_id)  # Ana düğümleri kaydediyoruz.
-            nodes[node_id]["papers"].add(paper_title)
 
-            # Yazarın makale sayısını kaydet
-            author_paper_count[author] = author_paper_count.get(author, 0) + 1
+        # Ana yazarın bulunduğu makaleyi set'e ekle
+        nodes[node_id]["papers"][doi] = paper_title
 
         # Yardımcı yazar düğümleri ve kenarları ekleme
         for coauthor in coauthors:
@@ -66,7 +86,7 @@ def create_manual_graph(data):
                 nodes[coauthor_id] = {
                     "label": coauthor,
                     "orcid": "N/A",
-                    "papers": set(),
+                    "papers": {},  # Yardımcı yazarın makaleleri için dictionary
                     "color": "lightblue"
                 }
             # Ana yazar ile yardımcı yazar arasında kenar ekleme
@@ -75,10 +95,11 @@ def create_manual_graph(data):
                 edges[edge] = 0
             edges[edge] += 1  # Kenar ağırlığını artır
 
-    return nodes, edges, main_authors, author_paper_count
+    return nodes, edges, main_authors
 
 
-def visualize_graph(nodes, edges, author_paper_count, output_file="manual_graph_visualization.html"):
+# Graf görselleştirme
+def visualize_graph(nodes, edges, author_total_papers, output_file="manual_graph_visualization.html"):
     graph = Network(height="800px", width="100%", bgcolor="#222222", font_color="white")
 
     # Fizik ayarlarını doğrudan set_options ile belirliyoruz
@@ -115,21 +136,32 @@ def visualize_graph(nodes, edges, author_paper_count, output_file="manual_graph_
     """)
 
     # Ortalama makale sayısını hesapla
-    avg_paper_count = sum(author_paper_count.values()) / len(author_paper_count)
+    avg_paper_count = sum(author_total_papers.values()) / len(author_total_papers)
+    print(f"Ortalama Makale Sayısı: {avg_paper_count}\n")
 
     # Düğümleri ekleme
     for node_id, node_data in nodes.items():
-        paper_count = len(node_data["papers"])
+        author_name = node_data['label']
+        paper_count = author_total_papers.get(author_name, 0)
+
+        # Eğer düğüm bir ana yazara aitse makale bilgilerini al
+        paper_info = node_data.get("papers", {})  # Makale bilgileri: {doi: paper_title}
+        paper_details = "<br>".join(
+            [f"<b>DOI:</b> {doi} - <b>Başlık:</b> {title}" for doi, title in paper_info.items()]
+        )
+
+        # Boyut ve renk belirleme
         if paper_count > avg_paper_count * 1.2:  # %20 üzerinde olanlar
-            size = 40
+            size = 80
             color = "darkorange"
         elif paper_count < avg_paper_count * 0.8:  # %20 altında olanlar
-            size = 20
+            size = 40
             color = "lightblue"
         else:  # Ortalama civarında olanlar
-            size = 30
+            size = 60
             color = "gray"
 
+        # Title kısmına yazar ismi, makaleler ve DOI bilgileri ekleniyor
         graph.add_node(
             node_id,
             label=node_data['label'],
@@ -137,7 +169,7 @@ def visualize_graph(nodes, edges, author_paper_count, output_file="manual_graph_
                 <b>Yazar:</b> {node_data['label']}<br>
                 <b>ORCID:</b> {node_data['orcid']}<br>
                 <b>Toplam Makale Sayısı:</b> {paper_count}<br>
-                <b>Makaleler:</b><br>{'<br>'.join(node_data['papers'])}
+                <b>Makaleler:</b><br>{paper_details if paper_details else 'Bu yazar için makale bilgisi yok.'}
             """,
             color=color,
             size=size
@@ -145,7 +177,7 @@ def visualize_graph(nodes, edges, author_paper_count, output_file="manual_graph_
 
     # Kenarları ekleme
     for (source, target), weight in edges.items():
-        graph.add_edge(source, target, value=weight, width=weight * 2, title=f"Ortak Makale Sayısı: {weight}",color="white")
+        graph.add_edge(source, target, value=weight, width=weight * 2, title=f"Ortak Makale Sayısı: {weight}", color="white")
 
     # Grafı görselleştir
     graph.show(output_file, notebook=False)
@@ -155,7 +187,8 @@ def visualize_graph(nodes, edges, author_paper_count, output_file="manual_graph_
 def main():
     excel_file = "dataset.xlsx"  # Excel dosyasının yolu
     data = read_excel_data(excel_file)
-    nodes, edges, main_authors, author_paper_count = create_manual_graph(data)
+    author_total_papers = calculate_author_total_papers(data)
+    nodes, edges, main_authors = create_manual_graph(data)
 
     # Toplam düğüm sayısı, kenar sayısı ve ana düğüm sayısını yazdırma
     print("Graf Bilgileri:")
@@ -165,11 +198,11 @@ def main():
 
     # Yazarların toplam makale sayılarını yazdır
     print("\nYazarların Toplam Makale Sayıları:")
-    for author, count in author_paper_count.items():
+    for author, count in author_total_papers.items():
         print(f"{author}: {count}")
 
     # Grafı görselleştir
-    visualize_graph(nodes, edges, author_paper_count)
+    visualize_graph(nodes, edges, author_total_papers)
 
 
 if __name__ == "__main__":
