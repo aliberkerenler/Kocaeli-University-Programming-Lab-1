@@ -17,6 +17,7 @@ def read_excel_data(file_path):
 def create_manual_graph(data):
     nodes = {}  # Anahtar: node_id, Değer: Node bilgileri
     edges = []  # Kenarları (source, target) çiftleri olarak saklayacağız.
+    main_authors = set()  # Ana düğümleri saymak için bir küme
 
     for _, row in data.iterrows():
         author = row['author_name'].strip()
@@ -48,6 +49,7 @@ def create_manual_graph(data):
                 "doi": doi,
                 "color": "orange"
             }
+            main_authors.add(node_id)  # Ana düğümü ana yazar olarak kaydet
 
         # Yardımcı yazar düğümleri ve kenarları ekleme
         for coauthor in coauthors:
@@ -65,7 +67,7 @@ def create_manual_graph(data):
             # Ana yazar ile yardımcı yazar arasında kenar ekleme
             edges.append((node_id, coauthor_id))
 
-    return nodes, edges
+    return nodes, edges, main_authors
 
 
 # Pyvis kullanarak grafı görselleştirme
@@ -99,7 +101,15 @@ def visualize_graph(nodes, edges, output_file="manual_graph_visualization.html")
 def main():
     excel_file = "dataset.xlsx"  # Excel dosyasının yolu
     data = read_excel_data(excel_file)
-    nodes, edges = create_manual_graph(data)
+    nodes, edges, main_authors = create_manual_graph(data)
+
+    # Toplam sayıları yazdır
+    print("Graf Bilgileri:")
+    print(f"Toplam Ana Düğüm Sayısı: {len(main_authors)}")
+    print(f"Toplam Düğüm Sayısı: {len(nodes)}")
+    print(f"Toplam Kenar Sayısı: {len(edges)}")
+
+    # Grafı görselleştir
     visualize_graph(nodes, edges)
 
 
