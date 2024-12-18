@@ -17,7 +17,7 @@ def read_excel_data(file_path):
 def create_manual_graph(data):
     nodes = {}  # Anahtar: node_id, Değer: Node bilgileri
     edges = []  # Kenarları (source, target) çiftleri olarak saklayacağız.
-    main_authors = set()  # Ana düğümleri saymak için bir küme
+    main_authors = set()  # Ana düğüm yazarlarını saklamak için
 
     for _, row in data.iterrows():
         author = row['author_name'].strip()
@@ -49,7 +49,7 @@ def create_manual_graph(data):
                 "doi": doi,
                 "color": "orange"
             }
-            main_authors.add(node_id)  # Ana düğümü ana yazar olarak kaydet
+            main_authors.add(node_id)  # Ana düğümleri kaydediyoruz.
 
         # Yardımcı yazar düğümleri ve kenarları ekleme
         for coauthor in coauthors:
@@ -65,7 +65,9 @@ def create_manual_graph(data):
                     "color": "lightblue"
                 }
             # Ana yazar ile yardımcı yazar arasında kenar ekleme
-            edges.append((node_id, coauthor_id))
+            edge = (node_id, coauthor_id)
+            if edge not in edges and (coauthor_id, node_id) not in edges:  # Çift kenar kontrolü
+                edges.append(edge)
 
     return nodes, edges, main_authors
 
@@ -103,11 +105,11 @@ def main():
     data = read_excel_data(excel_file)
     nodes, edges, main_authors = create_manual_graph(data)
 
-    # Toplam sayıları yazdır
+    # Toplam düğüm sayısı, kenar sayısı ve ana düğüm sayısını yazdırma
     print("Graf Bilgileri:")
-    print(f"Toplam Ana Düğüm Sayısı: {len(main_authors)}")
     print(f"Toplam Düğüm Sayısı: {len(nodes)}")
     print(f"Toplam Kenar Sayısı: {len(edges)}")
+    print(f"Toplam Ana Düğüm Sayısı: {len(main_authors)}")
 
     # Grafı görselleştir
     visualize_graph(nodes, edges)
