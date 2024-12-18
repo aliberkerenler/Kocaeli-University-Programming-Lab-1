@@ -2,6 +2,7 @@ import pandas as pd
 from pyvis.network import Network
 import ast  # String'i listeye dönüştürmek için kullanılacak
 
+
 # Excel'den veri okuma
 def read_excel_data(file_path):
     df = pd.read_excel(file_path)
@@ -11,12 +12,12 @@ def read_excel_data(file_path):
             raise ValueError(f"Excel dosyasında '{col}' sütunu eksik!")
     return df[required_columns]
 
-# Graf oluşturma
-def create_graph(data):
-    graph = Network(height="800px", width="100%", bgcolor="#222222", font_color="white")
-    added_nodes = set()  # Benzersiz düğümleri kontrol etmek için
 
-    # Ana yazarları ve ilişkilerini işleme
+# Node ve Edge yapılarını manuel olarak oluşturma
+def create_manual_graph(data):
+    nodes = {}  # Anahtar: node_id, Değer: Node bilgileri
+    edges = []  # Kenarları (source, target) çiftleri olarak saklayacağız.
+
     for _, row in data.iterrows():
         author = row['author_name'].strip()
         orcid = row['orcid']
@@ -25,72 +26,82 @@ def create_graph(data):
         position = row['author_position']
 
         try:
-            # coauthors sütununu Python listesine dönüştür
-            coauthors = ast.literal_eval(row['coauthors'])
+            coauthors = ast.literal_eval(row['coauthors'])  # Coauthors listesini parse et
         except (ValueError, SyntaxError):
-            # Düzgün parse edilemezse boş liste olarak ele al
             coauthors = []
 
         coauthors = [coauthor.strip() for coauthor in coauthors]
 
         # Ana yazarı coauthors listesinden kaldır
-        if 1 <= position <= len(coauthors):  # Pozisyonun geçerli olduğundan emin ol
-            position -= 1  # 1 tabanlıyı 0 tabanlı hale getir
+        if 1 <= position <= len(coauthors):
+            position -= 1  # 1 tabanlıyı 0 tabanlıya dönüştür
             main_author_in_coauthors = coauthors[position]
             coauthors.remove(main_author_in_coauthors)
 
-        # Ana düğümü ekleme
+        # Ana yazar düğümünü ekleme
         node_id = f"{author}-{orcid}"
-        if node_id not in added_nodes:
-            graph.add_node(
-                node_id,
-                label=author,
-                title=f"""
-                    <b>Yazar:</b> {author} <br>
-                    <b>ORCID:</b> {orcid} <br>
-                    <b>Makale Başlığı:</b> {paper_title} <br>
-                    <b>DOI:</b> {doi}
-                """,
-                value=1,
-                color="orange"
-            )
-            added_nodes.add(node_id)
+        if node_id not in nodes:
+            nodes[node_id] = {
+                "label": author,
+                "orcid": orcid,
+                "paper_title": paper_title,
+                "doi": doi,
+                "color": "orange"
+            }
 
-        # Yardımcı düğümleri ekleme ve kenar oluşturma
+        # Yardımcı yazar düğümleri ve kenarları ekleme
         for coauthor in coauthors:
-            if not coauthor:
+            if not coauthor:  # Boş yazar ismini atla
                 continue
-            coauthor_id = f"{coauthor}"
-            if coauthor_id not in added_nodes:
-                graph.add_node(
-                    coauthor_id,
-                    label=coauthor,
-                    title=f"Yardımcı Yazar: {coauthor}",
-                    value=1,
-                    color="lightblue"
-                )
-                added_nodes.add(coauthor_id)
+            coauthor_id = coauthor
+            if coauthor_id not in nodes:
+                nodes[coauthor_id] = {
+                    "label": coauthor,
+                    "orcid": "N/A",
+                    "paper_title": "N/A",
+                    "doi": "N/A",
+                    "color": "lightblue"
+                }
+            # Ana yazar ile yardımcı yazar arasında kenar ekleme
+            edges.append((node_id, coauthor_id))
 
-            # Kenar ekleme (ana yazar -> yardımcı yazar)
-            graph.add_edge(
-                node_id,
-                coauthor_id,
-                title=f"Makale: {paper_title} <br> DOI: {doi}",
-                color="gray"
-            )
-    return graph
+    return nodes, edges
 
-# Graf görselleştirme
-def visualize_graph(graph, output_file="graph_visualization.html"):
+
+# Pyvis kullanarak grafı görselleştirme
+def visualize_graph(nodes, edges, output_file="manual_graph_visualization.html"):
+    graph = Network(height="800px", width="100%", bgcolor="#222222", font_color="white")
+
+    # Düğümleri ekleme
+    for node_id, node_data in nodes.items():
+        graph.add_node(
+            node_id,
+            label=node_data['label'],
+            title=f"""
+                <b>Yazar:</b> {node_data['label']}<br>
+                <b>ORCID:</b> {node_data['orcid']}<br>
+                <b>Makale Başlığı:</b> {node_data['paper_title']}<br>
+                <b>DOI:</b> {node_data['doi']}
+            """,
+            color=node_data['color']
+        )
+
+    # Kenarları ekleme
+    for source, target in edges:
+        graph.add_edge(source, target, color="gray")
+
+    # Grafı görselleştir
     graph.toggle_physics(True)
     graph.show(output_file, notebook=False)
 
+
 # Ana işlem
 def main():
-    excel_file = "dataset.xlsx"  # Excel dosyanızın yolu
+    excel_file = "dataset.xlsx"  # Excel dosyasının yolu
     data = read_excel_data(excel_file)
-    graph = create_graph(data)
-    visualize_graph(graph)
+    nodes, edges = create_manual_graph(data)
+    visualize_graph(nodes, edges)
+
 
 if __name__ == "__main__":
     main()
