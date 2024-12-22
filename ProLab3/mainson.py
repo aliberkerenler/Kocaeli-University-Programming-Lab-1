@@ -2,7 +2,6 @@ import pandas as pd
 from pyvis.network import Network
 import ast  # String'i listeye dönüştürmek için kullanılacak
 
-
 # Excel'den veri okuma
 def read_excel_data(file_path):
     df = pd.read_excel(file_path)
@@ -11,7 +10,6 @@ def read_excel_data(file_path):
         if col not in df.columns:
             raise ValueError(f"Excel dosyasında '{col}' sütunu eksik!")
     return df[required_columns]
-
 
 # Tüm yazarların toplam makale sayısını hesaplama
 def calculate_author_total_papers(data):
@@ -36,6 +34,18 @@ def calculate_author_total_papers(data):
 
     return author_total_papers
 
+# En çok işbirliği yapan yazarı belirleme
+def find_most_collaborative_author(edges):
+    collaboration_count = {}
+
+    for (source, target), weight in edges.items():
+        collaboration_count[source] = collaboration_count.get(source, 0) + weight
+        collaboration_count[target] = collaboration_count.get(target, 0) + weight
+
+    most_collaborative_author = max(collaboration_count, key=collaboration_count.get)
+    max_collaborations = collaboration_count[most_collaborative_author]
+
+    return most_collaborative_author, max_collaborations
 
 # Node ve Edge yapılarını manuel olarak oluşturma
 def create_manual_graph(data):
@@ -97,7 +107,7 @@ def create_manual_graph(data):
 
     return nodes, edges, main_authors
 
-
+# Graf görselleştirme ve HTML oluşturma
 def visualize_graph_with_output(nodes, edges, author_total_papers, output_file="interactive_graph.html"):
     graph = Network(height="800px", width="100%", bgcolor="#222222", font_color="white")
 
@@ -176,6 +186,9 @@ def visualize_graph_with_output(nodes, edges, author_total_papers, output_file="
     for (source, target), weight in edges.items():
         graph.add_edge(source, target, value=weight, width=weight * 2, title=f"Ortak Makale Sayısı: {weight}", color="white")
 
+    # En çok işbirliği yapan yazarı belirle
+    most_collaborative_author, max_collaborations = find_most_collaborative_author(edges)
+
     # HTML şablonu
     html_template = f"""
     <!DOCTYPE html>
@@ -240,6 +253,11 @@ def visualize_graph_with_output(nodes, edges, author_total_papers, output_file="
             function updateOutput(content) {{
                 document.getElementById('output').innerHTML = content;
             }}
+
+            function showMostCollaborativeAuthor() {{
+                const content = "En çok işbirliği yapan yazar: {most_collaborative_author} (Toplam İşbirliği: {max_collaborations})";
+                updateOutput(content);
+            }}
         </script>
     </head>
     <body>
@@ -251,7 +269,7 @@ def visualize_graph_with_output(nodes, edges, author_total_papers, output_file="
                 <div class="button" onclick="updateOutput('Kuyruktan BST oluşturuluyor...')">3. Kuyruktan BST oluşturma</div>
                 <div class="button" onclick="updateOutput('Kısa yollar hesaplanıyor...')">4. Kısa yolları hesaplama</div>
                 <div class="button" onclick="updateOutput('İşbirliği yapan yazar sayısı hesaplandı.')">5. İşbirliği yapan yazar sayısı</div>
-                <div class="button" onclick="updateOutput('En çok işbirliği yapan yazar: [Sonuç].')">6. En çok işbirliği yapan yazar</div>
+                <div class="button" onclick="showMostCollaborativeAuthor()">6. En çok işbirliği yapan yazar</div>
                 <div class="button" onclick="updateOutput('En uzun yol bulunuyor...')">7. En uzun yolun bulunması</div>
             </div>
             <div id="output">Çıktılar burada görüntülenecek.</div>
@@ -267,7 +285,6 @@ def visualize_graph_with_output(nodes, edges, author_total_papers, output_file="
         f.write(html_template)
 
     print(f"Graf çıktısı '{output_file}' olarak kaydedildi.")
-
 
 # Ana işlem
 def main():
@@ -289,7 +306,6 @@ def main():
 
     # Grafı görselleştir
     visualize_graph_with_output(nodes, edges, author_total_papers)
-
 
 if __name__ == "__main__":
     main()
