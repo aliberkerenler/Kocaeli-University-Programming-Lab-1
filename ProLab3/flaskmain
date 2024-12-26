@@ -1,5 +1,3 @@
-bu düzeltmeleri şu koda entegre edip bana at: 
-
 import pandas as pd
 from pyvis.network import Network
 import ast  # String'i listeye dönüştürmek için kullanılacak
@@ -8,6 +6,9 @@ import os
 
 app = Flask(__name__)
 
+# Global değişkenler
+nodes = {}
+edges = {}
 
 # Excel'den veri okuma
 def read_excel_data(file_path):
@@ -49,6 +50,7 @@ def find_most_collaborative_author(edges):
 
 # Node ve Edge yapılarını manuel olarak oluşturma
 def create_manual_graph(data):
+    global nodes, edges  # global olarak tanımlıyoruz
     nodes = {}
     edges = {}
     main_authors = set()
@@ -93,6 +95,7 @@ def create_manual_graph(data):
                 edges[edge] = 0
             edges[edge] += 1
     return nodes, edges, main_authors
+
 
 
 # Graf görselleştirme ve HTML oluşturma
@@ -164,6 +167,18 @@ def visualize_graph_with_output(nodes, edges, author_total_papers):
     return graph
 
 
+# Kullanıcıdan gelen yazar ID'sine göre işbirliği sayısını hesaplama route'u
+@app.route('/calculate_collaborators/<author_id>', methods=['GET'])
+def calculate_collaborators(author_id):
+    collaborators = set()
+    for (source, target) in edges:
+        if author_id in (source, target):
+            collaborators.add(source)
+            collaborators.add(target)
+    collaborators.discard(author_id)
+    total_collaborators = len(collaborators)
+    return f"{author_id} yazarının işbirliği yaptığı toplam yazar sayısı: {total_collaborators}"
+
 # Flask route for file upload
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
@@ -181,7 +196,6 @@ def upload_file():
             nodes, edges, main_authors = create_manual_graph(data)
             graph = visualize_graph_with_output(nodes, edges, author_total_papers)
             most_collaborative_author, max_collaborations = find_most_collaborative_author(edges)
-
             # HTML şablonunu oluştur
             html_template = f"""
             <!DOCTYPE html>
@@ -251,7 +265,7 @@ def upload_file():
                         const content = "En çok işbirliği yapan yazar: {most_collaborative_author} (Toplam İşbirliği: {max_collaborations})";
                         updateOutput(content);
                     }}
-        
+
                     function calculateShortestPath() {{
                         updateOutput('A ile B yazarı arasındaki en kısa yol hesaplaniyor...');
                         // Buraya kısa yol hesaplama işlemi ekleyin
@@ -272,9 +286,14 @@ def upload_file():
                         // Buraya kısa yolları hesaplama işlemi ekleyin
                     }}
 
-                    function countCollaboratingAuthors() {{
-                        updateOutput('İşbirliği yapan yazar sayısı hesaplandı.');
-                        // Buraya işbirliği yapan yazar sayısı hesaplama işlemi ekleyin
+                    function calculateCollaborators() {{
+                        const authorId = prompt("Lütfen yazar ID'sini girin (örneğin: 'John Doe-1234'):");
+                        if (authorId) {{
+                            fetch(`/calculate_collaborators/${{authorId}}`)
+                                .then(response => response.text())
+                                .then(data => updateOutput(data))
+                                .catch(error => updateOutput('Bir hata oluştu: ' + error));
+                        }}
                     }}
 
                     function findLongestPath() {{
@@ -291,7 +310,7 @@ def upload_file():
                         <div class="button" onclick="calculateNodeWeights()">2. A yazarı için düğüm ağırlıkları</div>
                         <div class="button" onclick="createBSTFromQueue()">3. Kuyruktan BST oluşturma</div>
                         <div class="button" onclick="calculateShortestPaths()">4. Kısa yolları hesaplama</div>
-                        <div class="button" onclick="countCollaboratingAuthors()">5. İşbirliği yapan yazar sayısı</div>
+                        <div class="button" onclick="calculateCollaborators()">5. İşbirliği yapan yazar sayısı</div>
                         <div class="button" onclick="showMostCollaborativeAuthor()">6. En çok işbirliği yapan yazar</div>
                         <div class="button" onclick="findLongestPath()">7. En uzun yolun bulunması</div>
                     </div>
