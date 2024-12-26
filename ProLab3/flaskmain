@@ -193,6 +193,57 @@ def find_longest_path(start_node, visited=None, current_path=None):
 
     return longest_path
 
+# En kısa yol bulma algoritması (BFS uygulanarak)
+def find_shortest_path_between_authors(start_author, end_author, nodes, edges):
+    # BFS için bir kuyruk ve ziyaret edilen düğümler listesi
+    queue = [(start_author, [start_author])]  # (current_node, path_so_far)
+    visited = set()
+
+    while queue:
+        current_node, path = queue.pop(0)
+        if current_node in visited:
+            continue
+        visited.add(current_node)
+
+        # Eğer hedef düğüme ulaşırsak yolu döndür
+        if current_node == end_author:
+            return path
+
+        # Komşu düğümleri sıraya ekle
+        for edge in edges:
+            if current_node in edge:
+                neighbor = edge[0] if edge[1] == current_node else edge[1]
+                if neighbor not in visited:
+                    queue.append((neighbor, path + [neighbor]))
+
+    # Eğer hedef düğüme ulaşılamazsa boş liste döndür
+    return []
+
+@app.route('/shortest_path/<start_author>/<end_author>', methods=['GET'])
+def shortest_path_route(start_author, end_author):
+    start_author = start_author.strip().lower()
+    end_author = end_author.strip().lower()
+
+    # Kullanıcı girdisine göre düğüm ID'lerini bul
+    start_node = next((node_id for node_id, node_data in nodes.items()
+                       if start_author in node_id.lower() or start_author in node_data['label'].lower()), None)
+    end_node = next((node_id for node_id, node_data in nodes.items()
+                     if end_author in node_id.lower() or end_author in node_data['label'].lower()), None)
+
+    if not start_node or not end_node:
+        return f"Hata: '{start_author}' veya '{end_author}' girdisiyle eşleşen bir yazar bulunamadı."
+
+    # En kısa yol algoritmasını çağır
+    path = find_shortest_path_between_authors(start_node, end_node, nodes, edges)
+
+    if not path:
+        return f"{start_author} ile {end_author} arasında bir bağlantı bulunamadı."
+
+    # Yol detaylarını döndür
+    path_details = " ➔ ".join([nodes[node]['label'] for node in path])
+    path_length = len(path)
+
+    return f"En kısa yol: {path_details} (Uzunluk: {path_length})"
 
 # Flask route for finding the longest path
 @app.route('/longest_path', methods=['POST'])
@@ -202,23 +253,45 @@ def get_longest_path():
         return f"Geçersiz veya bulunamayan yazar ID: {author_id}"
 
     longest_path = find_longest_path(author_id)
-    path_labels = [nodes[node]['label'] for node in longest_path]
+    path_labels = " ➔ ".join([nodes[node]['label'] for node in longest_path])
     path_length = len(longest_path)
 
     return f"Yazar {nodes[author_id]['label']} için en uzun yol: {path_labels} (Uzunluk: {path_length})"
 
 
 # Kullanıcıdan gelen yazar ID'sine göre işbirliği sayısını hesaplama route'u
-@app.route('/calculate_collaborators/<author_id>', methods=['GET'])
-def calculate_collaborators(author_id):
+@app.route('/calculate_collaborators/<author_input>', methods=['GET'])
+def calculate_collaborators(author_input):
+    author_input = author_input.strip().lower()  # Kullanıcı girdisini temizle
+    matching_node_ids = []  # Kullanıcının girdisine uygun düğüm ID'lerini toplayacağımız liste
+
+    # Kullanıcının girdisiyle eşleşen node ID'lerini bul
+    for node_id, node_data in nodes.items():
+        if author_input in node_id.lower() or author_input in node_data['label'].lower():
+            matching_node_ids.append(node_id)
+
+    # Eğer eşleşen düğüm bulunamazsa hata mesajı döndür
+    if not matching_node_ids:
+        return f"Hata: '{author_input}' girdisiyle eşleşen bir yazar bulunamadı."
+
+    # İşbirliği yapan yazarları toplamak için bir set kullanıyoruz
     collaborators = set()
+
+    # edges üzerinden matching_node_ids ile işbirliği yapılan yazarları bul
     for (source, target) in edges:
-        if author_id in (source, target):
+        if any(node_id.lower() == source.lower() or node_id.lower() == target.lower() for node_id in matching_node_ids):
             collaborators.add(source)
             collaborators.add(target)
-    collaborators.discard(author_id)
+
+    # Seçilen yazarı işbirliği listesinden çıkar
+    for node_id in matching_node_ids:
+        collaborators.discard(node_id)
+
+    # İşbirliği yapan toplam yazar sayısını hesapla
     total_collaborators = len(collaborators)
-    return f"{author_id} yazarının işbirliği yaptığı toplam yazar sayısı: {total_collaborators}"
+
+    # Sonuç mesajını döndür
+    return f"'{author_input}' yazarının işbirliği yaptığı toplam yazar sayısı: {total_collaborators}"
 
 # Flask route for file upload
 @app.route('/', methods=['GET', 'POST'])
@@ -322,10 +395,16 @@ def upload_file():
                         // Buraya kuyruktan BST oluşturma işlemi ekleyin
                     }}
 
-                    function calculateShortestPaths() {{
-                        updateOutput('Kısa yollar hesaplanıyor...');
-                        // Buraya kısa yolları hesaplama işlemi ekleyin
-                    }}
+                     function calculateShortestPath() {{
+                        const startAuthor = prompt("Lütfen başlangıç yazarının ID'sini veya adını girin:");
+                        const endAuthor = prompt("Lütfen bitiş yazarının ID'sini veya adını girin:");
+                           if (startAuthor && endAuthor) {{
+                               fetch(`/shortest_path/${{startAuthor}}/${{endAuthor}}`)
+                               .then(response => response.text())
+                           .then(data => updateOutput(data))
+                            .catch(error => updateOutput('Bir hata oluştu: ' + error));
+                        }}
+                   }}
 
                     function calculateCollaborators() {{
                         const authorId = prompt("Lütfen yazar ID'sini girin (örneğin: 'John Doe-1234'):");
@@ -367,7 +446,7 @@ def upload_file():
                         <div class="button" onclick="calculateShortestPath()">1. A ile B yazarı arasındaki en kısa yol</div>
                         <div class="button" onclick="calculateNodeWeights()">2. A yazarı için düğüm ağırlıkları</div>
                         <div class="button" onclick="createBSTFromQueue()">3. Kuyruktan BST oluşturma</div>
-                        <div class="button" onclick="calculateShortestPaths()">4. Kısa yolları hesaplama</div>
+                        <div class="button" onclick="calculateShortestPath()">4. Kısa yolları hesaplama</div>
                         <div class="button" onclick="calculateCollaborators()">5. İşbirliği yapan yazar sayısı</div>
                         <div class="button" onclick="showMostCollaborativeAuthor()">6. En çok işbirliği yapan yazar</div>
                         <div class="button" onclick="findLongestPath()">7. En uzun yolun bulunması</div>
