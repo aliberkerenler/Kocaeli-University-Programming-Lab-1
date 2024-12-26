@@ -166,6 +166,47 @@ def visualize_graph_with_output(nodes, edges, author_total_papers):
                        color="white")
     return graph
 
+# En uzun yolu bulma fonksiyonu
+def find_longest_path(start_node, visited=None, current_path=None):
+    if visited is None:
+        visited = set()
+    if current_path is None:
+        current_path = []
+
+    visited.add(start_node)
+    current_path.append(start_node)
+
+    longest_path = current_path.copy()  # Şu ana kadarki en uzun yol
+    for (source, target) in edges:
+        if source == start_node and target not in visited:
+            new_path = find_longest_path(target, visited, current_path)
+            if len(new_path) > len(longest_path):
+                longest_path = new_path
+        elif target == start_node and source not in visited:
+            new_path = find_longest_path(source, visited, current_path)
+            if len(new_path) > len(longest_path):
+                longest_path = new_path
+
+    # Backtracking (geri alma)
+    visited.remove(start_node)
+    current_path.pop()
+
+    return longest_path
+
+
+# Flask route for finding the longest path
+@app.route('/longest_path', methods=['POST'])
+def get_longest_path():
+    author_id = request.form.get('author_id')  # Kullanıcıdan yazar ID'si alınır
+    if not author_id or author_id not in nodes:
+        return f"Geçersiz veya bulunamayan yazar ID: {author_id}"
+
+    longest_path = find_longest_path(author_id)
+    path_labels = [nodes[node]['label'] for node in longest_path]
+    path_length = len(longest_path)
+
+    return f"Yazar {nodes[author_id]['label']} için en uzun yol: {path_labels} (Uzunluk: {path_length})"
+
 
 # Kullanıcıdan gelen yazar ID'sine göre işbirliği sayısını hesaplama route'u
 @app.route('/calculate_collaborators/<author_id>', methods=['GET'])
@@ -297,8 +338,25 @@ def upload_file():
                     }}
 
                     function findLongestPath() {{
-                        updateOutput('En uzun yol bulunuyor...');
-                        // Buraya en uzun yol bulma işlemi ekleyin
+                        const authorId = prompt("Lütfen bir yazar ID'si girin:");
+                        if (!authorId) {{
+                            updateOutput("Yazar ID'si girilmedi.");
+                            return;
+                        }}
+                        fetch('/longest_path', {{
+                            method: 'POST',
+                            headers: {{
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            }},
+                            body: `author_id=${{authorId}}`,
+                        }})
+                        .then(response => response.text())
+                        .then(data => {{
+                            updateOutput(data);
+                        }})
+                        .catch(error => {{
+                            updateOutput("Hata: " + error.message);
+                        }});
                     }}
                 </script>
             </head>
