@@ -1,7 +1,7 @@
 import pandas as pd
 from pyvis.network import Network
 import ast  # String'i listeye dönüştürmek için kullanılacak
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template_string, jsonify
 import os
 
 app = Flask(__name__)
@@ -19,8 +19,10 @@ def read_excel_data(file_path):
             raise ValueError(f"Excel dosyasında '{col}' sütunu eksik!")
     return df[required_columns]
 
+# Excel dosyasını burada okuyoruz, örneğin 'data.xlsx' dosyasını kullanarak
+data = read_excel_data('dataset.xlsx')
 
-# Tüm yazarların toplam makale sayısını hesaplama
+# Tüm yazarların toplam makale sayısını hesaplayan fonksiyon
 def calculate_author_total_papers(data):
     author_total_papers = {}
     for _, row in data.iterrows():
@@ -36,6 +38,38 @@ def calculate_author_total_papers(data):
             author_total_papers[author] = author_total_papers.get(author, 0) + 1
     return author_total_papers
 
+
+
+# A yazarı ve işbirliği yaptığı yazarların düğüm ağırlıklarına göre sıralanması
+def calculate_node_weights(data, author_id):
+    # Tüm yazarların toplam makale sayısını hesapla
+    author_total_papers = calculate_author_total_papers(data)
+
+    # A yazarı ile işbirliği yapan diğer yazarları belirle
+    coauthors = set()
+    for _, row in data.iterrows():
+        if row['author_name'].strip() == author_id:
+            try:
+                row_coauthors = ast.literal_eval(row['coauthors'])
+                coauthors.update([coauthor.strip() for coauthor in row_coauthors])
+            except (ValueError, SyntaxError):
+                continue
+
+    # A yazarı ile işbirliği yapan yazarların makale sayısını al
+    node_weights = []
+    for coauthor in coauthors:
+        if coauthor in author_total_papers:
+            node_weights.append((coauthor, author_total_papers[coauthor]))
+
+    # Düğüm ağırlıklarına göre sıralama
+    node_weights.sort(key=lambda x: x[1], reverse=True)  # Ağırlığa göre azalan sırada sıralanır
+
+    return node_weights
+
+@app.route('/calculate_node_weights/<author_id>', methods=['GET'])
+def calculate_node_weights_route(author_id):
+    weights = calculate_node_weights(data, author_id)
+    return jsonify({'weights': [{'name': author, 'articles': count} for author, count in weights]})
 
 # En çok işbirliği yapan yazarı belirleme
 def find_most_collaborative_author(edges):
@@ -219,6 +253,56 @@ def find_shortest_path_between_authors(start_author, end_author, nodes, edges):
     # Eğer hedef düğüme ulaşılamazsa boş liste döndür
     return []
 
+
+@app.route('/shortest_paths_from_author', methods=['POST'])
+def shortest_paths_from_author():
+    author_id = request.form.get('author_id')
+    if not author_id or author_id not in nodes:
+        return f"Geçersiz veya bulunamayan yazar ID: {author_id}"
+
+    distances, previous_nodes = calculate_shortest_paths_from_author(author_id, nodes, edges)
+
+    result_html = f"<h2>{nodes[author_id]['label']} için en kısa yollar:</h2><table border='1'><tr><th>Yazar</th><th>Mesafe</th><th>Yol</th></tr>"
+    for node_id, distance in distances.items():
+        if distance < float('inf'):
+            path = []
+            current = node_id
+            while current is not None:
+                path.append(nodes[current]['label'])
+                current = previous_nodes[current]
+            path = ' ➔ '.join(path[::-1])
+            result_html += f"<tr><td>{nodes[node_id]['label']}</td><td>{distance}</td><td>{path}</td></tr>"
+    result_html += "</table>"
+
+    return result_html
+
+def calculate_shortest_paths_from_author(author_id, nodes, edges):
+    # A yazarı ve işbirlikçileri arasında kısa yolları hesaplamak için Dijkstra Algoritması'nı manuel olarak uyguluyoruz.
+    distances = {node_id: float('inf') for node_id in nodes}
+    distances[author_id] = 0
+    unvisited_nodes = list(nodes.keys())
+    previous_nodes = {node_id: None for node_id in nodes}
+
+    while unvisited_nodes:
+        # En kısa mesafeye sahip düğümü bul
+        current_node = min(unvisited_nodes, key=lambda node: distances[node])
+        unvisited_nodes.remove(current_node)
+
+        if distances[current_node] == float('inf'):
+            break
+
+        # Komşu düğümler üzerinden güncellemeler yap
+        for (source, target), weight in edges.items():
+            if source == current_node or target == current_node:
+                neighbor = target if source == current_node else source
+                alternative_route = distances[current_node] + weight
+                if alternative_route < distances[neighbor]:
+                    distances[neighbor] = alternative_route
+                    previous_nodes[neighbor] = current_node
+
+    return distances, previous_nodes
+
+
 @app.route('/shortest_path/<start_author>/<end_author>', methods=['GET'])
 def shortest_path_route(start_author, end_author):
     start_author = start_author.strip().lower()
@@ -292,6 +376,72 @@ def calculate_collaborators(author_input):
 
     # Sonuç mesajını döndür
     return f"'{author_input}' yazarının işbirliği yaptığı toplam yazar sayısı: {total_collaborators}"
+
+    # Dijkstra Algoritması ile en kısa yolu bulma
+    def dijkstra(graph, start):
+        shortest_paths = {start: (None, 0)}
+        current_node = start
+        visited = set()
+
+        while current_node is not None:
+            visited.add(current_node)
+            destinations = graph.get(current_node, {})
+            weight_to_current_node = shortest_paths[current_node][1]
+
+            for next_node, weight in destinations.items():
+                total_weight = weight_to_current_node + weight
+                if next_node not in shortest_paths:
+                    shortest_paths[next_node] = (current_node, total_weight)
+                else:
+                    current_shortest_weight = shortest_paths[next_node][1]
+                    if current_shortest_weight > total_weight:
+                        shortest_paths[next_node] = (current_node, total_weight)
+
+            next_destinations = {node: shortest_paths[node] for node in shortest_paths if node not in visited}
+            if not next_destinations:
+                break
+
+            current_node = min(next_destinations, key=lambda k: next_destinations[k][1])
+
+        return shortest_paths
+
+    # Ağırlıklı grafiği oluşturma
+    def create_weighted_graph(author_id):
+        graph = {}
+        for (source, target), weight in edges.items():
+            if source == author_id or target == author_id:
+                if source not in graph:
+                    graph[source] = {}
+                if target not in graph:
+                    graph[target] = {}
+                graph[source][target] = weight
+                graph[target][source] = weight
+        return graph
+
+    # Flask route for calculating shortest paths
+    @app.route('/calculate_shortest_paths', methods=['POST'])
+    def calculate_shortest_paths():
+        author_id = request.form.get('author_id')
+        if not author_id or author_id not in nodes:
+            return f"Geçersiz veya bulunamayan yazar ID: {author_id}"
+
+        weighted_graph = create_weighted_graph(author_id)
+        shortest_paths = dijkstra(weighted_graph, author_id)
+
+        table_html = "<table border='1'><tr><th>Yazar</th><th>En Kısa Mesafe</th><th>Yol</th></tr>"
+        for node in shortest_paths:
+            path = []
+            current_node = node
+            while current_node is not None:
+                path.append(nodes[current_node]['label'])
+                next_node = shortest_paths[current_node][0]
+                current_node = next_node
+            path = path[::-1]
+            distance = shortest_paths[node][1]
+            table_html += f"<tr><td>{nodes[node]['label']}</td><td>{distance}</td><td>{' ➔ '.join(path)}</td></tr>"
+        table_html += "</table>"
+
+        return table_html
 
 # Flask route for file upload
 @app.route('/', methods=['GET', 'POST'])
@@ -374,28 +524,8 @@ def upload_file():
                     function updateOutput(content) {{
                         document.getElementById('output').innerHTML = content;
                     }}
-
-                    function showMostCollaborativeAuthor() {{
-                        const content = "En çok işbirliği yapan yazar: {most_collaborative_author} (Toplam İşbirliği: {max_collaborations})";
-                        updateOutput(content);
-                    }}
-
+                    
                     function calculateShortestPath() {{
-                        updateOutput('A ile B yazarı arasındaki en kısa yol hesaplaniyor...');
-                        // Buraya kısa yol hesaplama işlemi ekleyin
-                    }}
-
-                    function calculateNodeWeights() {{
-                        updateOutput('A yazarı için düğüm ağırlıkları hesaplandı.');
-                        // Buraya düğüm ağırlığı hesaplama işlemi ekleyin
-                    }}
-
-                    function createBSTFromQueue() {{
-                        updateOutput('Kuyruktan BST oluşturuluyor...');
-                        // Buraya kuyruktan BST oluşturma işlemi ekleyin
-                    }}
-
-                     function calculateShortestPath() {{
                         const startAuthor = prompt("Lütfen başlangıç yazarının ID'sini veya adını girin:");
                         const endAuthor = prompt("Lütfen bitiş yazarının ID'sini veya adını girin:");
                            if (startAuthor && endAuthor) {{
@@ -404,39 +534,87 @@ def upload_file():
                            .then(data => updateOutput(data))
                             .catch(error => updateOutput('Bir hata oluştu: ' + error));
                         }}
-                   }}
-
-                    function calculateCollaborators() {{
-                        const authorId = prompt("Lütfen yazar ID'sini girin (örneğin: 'John Doe-1234'):");
-                        if (authorId) {{
-                            fetch(`/calculate_collaborators/${{authorId}}`)
-                                .then(response => response.text())
-                                .then(data => updateOutput(data))
-                                .catch(error => updateOutput('Bir hata oluştu: ' + error));
-                        }}
                     }}
 
-                    function findLongestPath() {{
-                        const authorId = prompt("Lütfen bir yazar ID'si girin:");
+                    function showMostCollaborativeAuthor() {{
+                        const content = "En çok işbirliği yapan yazar: {most_collaborative_author} (Toplam İşbirliği: {max_collaborations})";
+                        updateOutput(content);
+                    }}
+
+                    function createBSTFromQueue() {{
+                        updateOutput('Kuyruktan BST oluşturuluyor...');
+                        // Buraya kuyruktan BST oluşturma işlemi ekleyin
+                    }}
+                     
+                    function calculateShortestPathsFromAuthor() {{
+                        const authorId = prompt("Lütfen yazar ID'sini girin (örneğin: 'John Doe-1234'):");
                         if (!authorId) {{
                             updateOutput("Yazar ID'si girilmedi.");
                             return;
                         }}
-                        fetch('/longest_path', {{
+                        fetch('/shortest_paths_from_author', {{
                             method: 'POST',
                             headers: {{
                                 'Content-Type': 'application/x-www-form-urlencoded',
                             }},
                             body: `author_id=${{authorId}}`,
                         }})
-                        .then(response => response.text())
-                        .then(data => {{
-                            updateOutput(data);
-                        }})
-                        .catch(error => {{
-                            updateOutput("Hata: " + error.message);
-                        }});
-                    }}
+                            .then(response => response.text())
+                            .then(data => {{
+                                updateOutput(data);
+                            }})
+                            .catch(error => {{
+                                updateOutput("Hata: " + error.message);
+                            }});
+                        }}
+
+                        function calculateCollaborators() {{
+                            const authorId = prompt("Lütfen yazar ID'sini girin (örneğin: 'John Doe-1234'):");
+                            if (authorId) {{
+                                fetch(`/calculate_collaborators/${{authorId}}`)
+                                    .then(response => response.text())
+                                    .then(data => updateOutput(data))
+                                    .catch(error => updateOutput('Bir hata oluştu: ' + error));
+                            }}
+                        }}
+                        
+                        function calculateNodeWeights() {{
+                            const authorId = prompt("Lütfen A yazarının ID'sini girin:");
+                            if (authorId) {{
+                                fetch(`/calculate_node_weights/${{authorId}}`)
+                                    .then(response => response.json())
+                                    .then(data => {{
+                                        let content = 'Düğüm ağırlıkları hesaplandı:<br>';
+                                        data.weights.forEach(weight => {{
+                                        content += `${{weight.name}}: ${{weight.articles}} makale<br>`;
+                                    }});
+                                    updateOutput(content);
+                                }})
+                                .catch(error => updateOutput('Bir hata oluştu: ' + error));
+                            }}
+                        }}
+
+                        function findLongestPath() {{
+                            const authorId = prompt("Lütfen bir yazar ID'si girin:");
+                            if (!authorId) {{
+                                updateOutput("Yazar ID'si girilmedi.");
+                                return;
+                            }}
+                            fetch('/longest_path', {{
+                                method: 'POST',
+                                headers: {{
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                }},
+                                body: `author_id=${{authorId}}`,
+                            }})
+                            .then(response => response.text())
+                            .then(data => {{
+                                updateOutput(data);
+                            }})
+                            .catch(error => {{
+                                updateOutput("Hata: " + error.message);
+                            }});
+                        }}
                 </script>
             </head>
             <body>
@@ -446,7 +624,7 @@ def upload_file():
                         <div class="button" onclick="calculateShortestPath()">1. A ile B yazarı arasındaki en kısa yol</div>
                         <div class="button" onclick="calculateNodeWeights()">2. A yazarı için düğüm ağırlıkları</div>
                         <div class="button" onclick="createBSTFromQueue()">3. Kuyruktan BST oluşturma</div>
-                        <div class="button" onclick="calculateShortestPath()">4. Kısa yolları hesaplama</div>
+                        <div class="button" onclick="calculateShortestPathsFromAuthor()">4. Kısa yolları hesaplama</div>
                         <div class="button" onclick="calculateCollaborators()">5. İşbirliği yapan yazar sayısı</div>
                         <div class="button" onclick="showMostCollaborativeAuthor()">6. En çok işbirliği yapan yazar</div>
                         <div class="button" onclick="findLongestPath()">7. En uzun yolun bulunması</div>
