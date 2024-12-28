@@ -1,15 +1,18 @@
+import webbrowser
+
 import pandas as pd
 from pyvis.network import Network
 import ast  # String'i listeye dönüştürmek için kullanılacak
 import os
-from flask import Flask, request, render_template_string, jsonify
-
+from flask import Flask, request, render_template_string, jsonify, session
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Set this to a unique and secret key
 
 # Global değişkenler
 nodes = {}
 edges = {}
+queue = []
 
 
 # Excel'den veri okuma fonksiyonu
@@ -265,6 +268,55 @@ def find_shortest_path_between_authors(start_author, end_author, nodes, edges):
     # Eğer hedef düğüme ulaşılamazsa boş liste döndür
     return []
 
+@app.route('/shortest_paths_from_author', methods=['POST'])
+def shortest_paths_from_author():
+    author_id = request.form.get('author_id')
+    if not author_id or author_id not in nodes:
+        return f"Geçersiz veya bulunamayan yazar ID: {author_id}"
+
+    distances, previous_nodes = calculate_shortest_paths_from_author(author_id, nodes, edges)
+
+    result_html = f"<h2>{nodes[author_id]['label']} için en kısa yollar:</h2><table border='1'><tr><th>Yazar</th><th>Mesafe</th><th>Yol</th></tr>"
+    for node_id, distance in distances.items():
+        if distance < float('inf'):
+            path = []
+            current = node_id
+            while current is not None:
+                path.append(nodes[current]['label'])
+                current = previous_nodes[current]
+            path = ' ➔ '.join(path[::-1])
+            result_html += f"<tr><td>{nodes[node_id]['label']}</td><td>{distance}</td><td>{path}</td></tr>"
+    result_html += "</table>"
+
+    return result_html
+
+def calculate_shortest_paths_from_author(author_id, nodes, edges):
+    # A yazarı ve işbirlikçileri arasında kısa yolları hesaplamak için Dijkstra Algoritması'nı manuel olarak uyguluyoruz.
+    distances = {node_id: float('inf') for node_id in nodes}
+    distances[author_id] = 0
+    unvisited_nodes = list(nodes.keys())
+    previous_nodes = {node_id: None for node_id in nodes}
+
+    while unvisited_nodes:
+        # En kısa mesafeye sahip düğümü bul
+        current_node = min(unvisited_nodes, key=lambda node: distances[node])
+        unvisited_nodes.remove(current_node)
+
+        if distances[current_node] == float('inf'):
+            break
+
+        # Komşu düğümler üzerinden güncellemeler yap
+        for (source, target), weight in edges.items():
+            if source == current_node or target == current_node:
+                neighbor = target if source == current_node else source
+                alternative_route = distances[current_node] + weight
+                if alternative_route < distances[neighbor]:
+                    distances[neighbor] = alternative_route
+                    previous_nodes[neighbor] = current_node
+
+    return distances, previous_nodes
+
+
 
 @app.route('/shortest_path/<start_author>/<end_author>', methods=['GET'])
 def shortest_path_route(start_author, end_author):
@@ -281,17 +333,19 @@ def shortest_path_route(start_author, end_author):
         return f"Hata: '{start_author}' veya '{end_author}' girdisiyle eşleşen bir yazar bulunamadı."
 
     # En kısa yol algoritmasını çağır
-    path = find_shortest_path_between_authors(start_node, end_node, nodes, edges)
+    queue = find_shortest_path_between_authors(start_node, end_node, nodes, edges)
 
-    if not path:
+    if not queue:
         return f"{start_author} ile {end_author} arasında bir bağlantı bulunamadı."
 
+    session['queue'] = queue
+
     # Yol detaylarını döndür
-    path_details = " ➔ ".join([nodes[node]['label'] for node in path])
-    path_length = len(path)
+    path_details = " ➔ ".join([nodes[node]['label'] for node in queue])
+    path_length = len(queue)
 
     # Grafiği oluştur ve HTML dosyasını kaydet
-    graph = visualize_graph_with_output(nodes, edges, calculate_author_total_papers(data), path)
+    graph = visualize_graph_with_output(nodes, edges, calculate_author_total_papers(data), queue)
     graph_path = f"graph_{start_author}_{end_author}.html"
     graph.save_graph(graph_path)
 
@@ -364,9 +418,136 @@ def find_longest_path(start_node, visited=None, current_path=None):
 
     return longest_path
 
+class TreeNode:
+    def __init__(self, author_name):
+        self.author_name = author_name
+        self.left = None
+        self.right = None
 
-import webbrowser
+class BinarySearchTree:
+    def __init__(self):
+        self.root = None
 
+    def insert(self, author_name):
+        if not self.root:
+            self.root = TreeNode(author_name)
+        else:
+            self._insert(self.root, author_name)
+
+    def _insert(self, node, author_name):
+        if author_name < node.author_name:
+            if node.left is None:
+                node.left = TreeNode(author_name)
+            else:
+                self._insert(node.left, author_name)
+        else:
+            if author_name >= node.author_name:
+                if node.right is None:
+                    node.right = TreeNode(author_name)
+                else:
+                    self._insert(node.right, author_name)
+
+    def delete(self, author_name):
+        self.root = self._delete(self.root, author_name)
+
+    def _delete(self, node, author_name):
+        if not node:
+            return node
+
+        if author_name < node.author_name:
+            node.left = self._delete(node.left, author_name)
+        elif author_name > node.author_name:
+            node.right = self._delete(node.right, author_name)
+        else:
+            if node.left is None:
+                return node.right
+            elif node.right is None:
+                return node.left
+
+            temp_val = self._min_value_node(node.right)
+            node.author_name = temp_val.author_name
+            node.right = self._delete(node.right, temp_val.author_name)
+
+        return node
+
+    def _min_value_node(self, node):
+        current = node
+        while current.left is not None:
+            current = current.left
+        return current
+
+    def inorder_traversal(self, node, result):
+        if node:
+            self.inorder_traversal(node.left, result)
+            result.append(node.author_name)
+            self.inorder_traversal(node.right, result)
+        return result
+
+    def count_nodes(self, node):
+        if node is None:
+            return 0
+        return 1 + self.count_nodes(node.left) + self.count_nodes(node.right)
+
+def create_bst_from_queue(queue):
+    bst = BinarySearchTree()
+    for author in queue:
+        bst.insert(author)
+    return bst
+
+def visualize_bst(bst):
+    graph = Network(height="800px", width="100%", bgcolor="#222222", font_color="white")
+
+    def add_nodes(node):
+        if node:
+            graph.add_node(node.author_name, label=node.author_name)
+            add_nodes(node.left)
+            add_nodes(node.right)
+
+    def add_edges(node):
+        if node:
+            if node.left:
+                graph.add_edge(node.author_name, node.left.author_name, color="white")
+                add_edges(node.left)
+            if node.right:
+                graph.add_edge(node.author_name, node.right.author_name, color="white")
+                add_edges(node.right)
+
+    # Add all nodes first
+    add_nodes(bst.root)
+    # Then add all edges
+    add_edges(bst.root)
+
+    # Manually create the HTML content
+    html_content = graph.generate_html()
+
+    # Save the HTML to a file
+    output_file = "bst.html"
+    with open(output_file, 'w') as f:
+        f.write(html_content)
+
+    # Open the HTML file in the default web browser
+    webbrowser.open_new_tab(output_file)
+
+
+@app.route('/create_bst', methods=['POST'])
+def create_bst_route():
+    queue = session.get('queue', [])
+
+    if not queue:
+        return "Queue is empty or not initialized."
+
+    bst = create_bst_from_queue(queue)
+    author_id_to_delete = request.form.get('author_id')
+    if author_id_to_delete:
+        bst.delete(author_id_to_delete)
+
+    # Count the number of nodes in the BST
+    node_count = bst.count_nodes(bst.root)
+
+    # Visualize the BST
+    visualize_bst(bst)
+
+    return f"BST created and visualized. Number of articles in the tree: {node_count}"
 
 @app.route('/longest_path', methods=['POST'])
 def get_longest_path():
@@ -490,24 +671,41 @@ def upload_file():
 
 
                     function calculateNodeWeights() {{
-            const authorId = prompt("Lütfen A yazarının ID'sini girin:");
-            if (authorId) {{
-                fetch(`/calculate_node_weights/${{authorId}}`)
-                    .then(response => response.json())
-                    .then(data => {{
-                        let content = 'Düğüm ağırlıkları hesaplandı:<br>';
-                        data.weights.forEach(weight => {{
-                            content += `${{weight.name}}: ${{weight.articles}} makale<br>`;
+                        const authorId = prompt("Lütfen A yazarının ID'sini girin:");
+                        if (authorId) {{
+                            fetch(`/calculate_node_weights/${{authorId}}`)
+                            .then(response => response.json())
+                            .then(data => {{
+                                let content = 'Düğüm ağırlıkları hesaplandı:<br>';
+                                data.weights.forEach(weight => {{
+                                    content += `${{weight.name}}: ${{weight.articles}} makale<br>`;
+                                }});
+                                updateOutput(content);
+                            }})
+                            .catch(error => updateOutput('Bir hata oluştu: ' + error));
+                        }}
+                    }}
+                    
+                    function calculateShortestPathsFromAuthor() {{
+                        const authorId = prompt("Lütfen yazar ID'sini girin (örneğin: 'John Doe-1234'):");
+                        if (!authorId) {{
+                            updateOutput("Yazar ID'si girilmedi.");
+                            return;
+                        }}
+                        fetch('/shortest_paths_from_author', {{
+                            method: 'POST',
+                            headers: {{
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            }},
+                            body: `author_id=${{authorId}}`,
+                        }})
+                        .then(response => response.text())
+                        .then(data => {{
+                            updateOutput(data);
+                        }})
+                        .catch(error => {{
+                            updateOutput("Hata: " + error.message);
                         }});
-                        updateOutput(content);
-                    }})
-                    .catch(error => updateOutput('Bir hata oluştu: ' + error));
-            }}
-        }}
-
-                    function createBSTFromQueue() {{
-                        updateOutput('Kuyruktan BST oluşturuluyor...');
-                        // Buraya kuyruktan BST oluşturma işlemi ekleyin
                     }}
 
                      function calculateShortestPath() {{
@@ -529,6 +727,19 @@ def upload_file():
                                 .then(data => updateOutput(data))
                                 .catch(error => updateOutput('Bir hata oluştu: ' + error));
                         }}
+                    }}
+                    
+                    function createBSTFromQueue() {{
+                        const authorId = prompt("Lütfen silinecek yazar ID'sini girin:");
+                        const formData = new FormData();
+                        formData.append('author_id', authorId);
+                        fetch('/create_bst', {{
+                            method: 'POST',
+                            body: formData
+                        }})
+                        .then(response => response.text())
+                        .then(data => updateOutput(data))
+                        .catch(error => updateOutput('Bir hata oluştu: ' + error));
                     }}
 
                     function findLongestPath() {{
@@ -561,7 +772,7 @@ def upload_file():
                         <div class="button" onclick="calculateShortestPath()">1. A ile B yazarı arasındaki en kısa yol</div>
                         <div class="button" onclick="calculateNodeWeights()">2. A yazarı için düğüm ağırlıkları</div>
                         <div class="button" onclick="createBSTFromQueue()">3. Kuyruktan BST oluşturma</div>
-                        <div class="button" onclick="calculateShortestPath()">4. Kısa yolları hesaplama</div>
+                        <div class="button" onclick="calculateShortestPathsFromAuthor()">4. Kısa yolları hesaplama</div>
                         <div class="button" onclick="calculateCollaborators()">5. İşbirliği yapan yazar sayısı</div>
                         <div class="button" onclick="showMostCollaborativeAuthor()">6. En çok işbirliği yapan yazar</div>
                         <div class="button" onclick="findLongestPath()">7. En uzun yolun bulunması</div>
