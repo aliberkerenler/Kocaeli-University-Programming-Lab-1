@@ -3,12 +3,15 @@ import ast
 from flask import Flask, request, render_template_string, jsonify
 import pandas as pd
 from pyvis.network import Network
+import webbrowser
 
 app = Flask(__name__)
+app.secret_key = 'secret_key'
 
 # Global değişkenler
 nodes_map = {}
 links_map = {}
+queue = []
 
 
 # Excel verisini yükleyip kontrol etme
@@ -66,6 +69,8 @@ def locate_shortest_path(start, end, node_map, link_map):
 
 @app.route('/shortest_path_route/<start_author>/<end_author>', methods=['GET'])
 def retrieve_shortest_path(start_author, end_author):
+    global queue  # Declare queue as a global variable
+
     start_author = start_author.strip().lower()
     end_author = end_author.strip().lower()
 
@@ -75,17 +80,20 @@ def retrieve_shortest_path(start_author, end_author):
                          end_author in node_id.lower() or end_author in node_info['label'].lower()), None)
 
     if not start_node_id or not end_node_id:
-        return f"Hata: '{start_author}' veya '{end_author}' için geçerli bir yazar bulunamadı."
+        return f"Error: No valid author found for '{start_author}' or '{end_author}'."
 
     shortest_path = locate_shortest_path(start_node_id, end_node_id, nodes_map, links_map)
 
     if not shortest_path:
-        return f"{start_author} ile {end_author} arasında bir bağlantı bulunamadı."
+        return f"No connection found between {start_author} and {end_author}."
+
+    # Update the global queue variable
+    queue = shortest_path
 
     path_representation = " ➔ ".join([nodes_map[node]['label'] for node in shortest_path])
     path_length = len(shortest_path)
 
-    return f"En kısa yol: {path_representation} (Uzunluk: {path_length})"
+    return f"Shortest path: {path_representation} (Length: {path_length})"
 
 # Düğüm ağırlıklarını belirle
 def find_node_weights(data, author_name):
@@ -136,6 +144,130 @@ def execute_dijkstra(start_id, all_nodes, all_edges):
                     previous_nodes[neighbor_node] = current_node
 
     return path_lengths, previous_nodes
+
+class AuthorNode:
+    def __init__(self, name, publications=1):
+        self.name = name
+        self.publications = publications
+        self.left_child = None
+        self.right_child = None
+
+class AuthorBST:
+    def __init__(self):
+        self.root_node = None
+
+    def add_author(self, name):
+        if not self.root_node:
+            self.root_node = AuthorNode(name)
+        else:
+            self._add_author_recursive(self.root_node, name)
+
+    def _add_author_recursive(self, current_node, name):
+        if name < current_node.name:
+            if current_node.left_child is None:
+                current_node.left_child = AuthorNode(name)
+            else:
+                self._add_author_recursive(current_node.left_child, name)
+        elif name > current_node.name:
+            if current_node.right_child is None:
+                current_node.right_child = AuthorNode(name)
+            else:
+                self._add_author_recursive(current_node.right_child, name)
+        else:
+            current_node.publications += 1
+
+    def remove_author(self, name):
+        self.root_node = self._remove_author_recursive(self.root_node, name)
+
+    def _remove_author_recursive(self, current_node, name):
+        if not current_node:
+            return current_node
+
+        if name < current_node.name:
+            current_node.left_child = self._remove_author_recursive(current_node.left_child, name)
+        elif name > current_node.name:
+            current_node.right_child = self._remove_author_recursive(current_node.right_child, name)
+        else:
+            if current_node.left_child is None:
+                return current_node.right_child
+            elif current_node.right_child is None:
+                return current_node.left_child
+
+            temp_node = self._find_min_value_node(current_node.right_child)
+            current_node.name = temp_node.name
+            current_node.publications = temp_node.publications
+            current_node.right_child = self._remove_author_recursive(current_node.right_child, temp_node.name)
+
+        return current_node
+
+    def _find_min_value_node(self, node):
+        current = node
+        while current.left_child is not None:
+            current = current.left_child
+        return current
+
+    def in_order_traversal(self, node, result):
+        if node:
+            self.in_order_traversal(node.left_child, result)
+            result.append((node.name, node.publications))
+            self.in_order_traversal(node.right_child, result)
+        return result
+
+def build_bst_from_list(author_list):
+    bst = AuthorBST()
+    for author in author_list:
+        bst.add_author(author)
+    return bst
+
+def display_bst(bst):
+    graph = Network(height="800px", width="100%", bgcolor="#222222", font_color="white")
+
+    def add_graph_nodes(node):
+        if node:
+            graph.add_node(node.name, label=node.name)
+            add_graph_nodes(node.left_child)
+            add_graph_nodes(node.right_child)
+
+    def add_graph_edges(node):
+        if node:
+            if node.left_child:
+                graph.add_edge(node.name, node.left_child.name, color="white")
+                add_graph_edges(node.left_child)
+            if node.right_child:
+                graph.add_edge(node.name, node.right_child.name, color="white")
+                add_graph_edges(node.right_child)
+
+    add_graph_nodes(bst.root_node)
+    add_graph_edges(bst.root_node)
+
+    html_content = graph.generate_html()
+    output_filename = "author_bst.html"
+    with open(output_filename, 'w') as f:
+        f.write(html_content)
+
+    webbrowser.open_new_tab(output_filename)
+
+@app.route('/create_bst', methods=['POST'])
+def create_bst_route():
+    global queue  # Declare queue as a global variable
+
+    if not queue:
+        return "Queue is empty or not initialized."
+
+    bst = build_bst_from_list(queue)
+    author_to_remove = request.form.get('author_name')
+    if author_to_remove:
+        bst.remove_author(author_to_remove)
+
+    author_details = bst.in_order_traversal(bst.root_node, [])
+
+    display_bst(bst)
+
+    output = "BST created and visualized. \nAuthor details (Name: Number of Publications):\n"
+    for name, publications in author_details:
+        output += f"{name}: {publications}\n"
+
+    return output
 
 @app.route('/shortest_paths_from_author', methods=['POST'])
 def retrieve_shortest_paths_from_author():
@@ -524,7 +656,16 @@ def upload_file():
         }}
 
         function generateBSTFromQueue() {{
-            displayResult('Kuyruktan BST oluşturuluyor...');
+            const authorId = prompt("Lütfen silinecek yazar ID'sini girin:");
+            const formData = new FormData();
+            formData.append('author_id', authorId);
+            fetch('/create_bst', {{
+                method: 'POST',
+                body: formData
+            }})
+            .then(response => response.text())
+            .then(data => displayResult(data))
+            .catch(error => displayResult('Bir hata oluştu: ' + error));
         }}
 
         function computeShortestPaths() {{
