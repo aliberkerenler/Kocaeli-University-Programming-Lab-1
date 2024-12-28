@@ -240,8 +240,6 @@ def visualize_graph_with_output(nodes, edges, author_total_papers, highlight_pat
     return graph
 
 
-
-
 # En kısa yol bulma algoritması (BFS uygulanarak)
 def find_shortest_path_between_authors(start_author, end_author, nodes, edges):
     # BFS için bir kuyruk ve ziyaret edilen düğümler listesi
@@ -268,6 +266,7 @@ def find_shortest_path_between_authors(start_author, end_author, nodes, edges):
     # Eğer hedef düğüme ulaşılamazsa boş liste döndür
     return []
 
+
 @app.route('/shortest_paths_from_author', methods=['POST'])
 def shortest_paths_from_author():
     author_id = request.form.get('author_id')
@@ -289,6 +288,7 @@ def shortest_paths_from_author():
     result_html += "</table>"
 
     return result_html
+
 
 def calculate_shortest_paths_from_author(author_id, nodes, edges):
     # A yazarı ve işbirlikçileri arasında kısa yolları hesaplamak için Dijkstra Algoritması'nı manuel olarak uyguluyoruz.
@@ -315,7 +315,6 @@ def calculate_shortest_paths_from_author(author_id, nodes, edges):
                     previous_nodes[neighbor] = current_node
 
     return distances, previous_nodes
-
 
 
 @app.route('/shortest_path/<start_author>/<end_author>', methods=['GET'])
@@ -353,9 +352,6 @@ def shortest_path_route(start_author, end_author):
     webbrowser.open_new_tab(graph_path)
 
     return f"En kısa yol: {path_details} (Uzunluk: {path_length})"
-
-
-
 
 
 # Kullanıcıdan gelen yazar ID'sine göre işbirliği sayısını hesaplama route'u
@@ -418,10 +414,12 @@ def find_longest_path(start_node, visited=None, current_path=None):
 
     return longest_path
 
+
+
+# BST düğüm sınıfı ve ekleme/silme fonksiyonları
 class TreeNode:
-    def __init__(self, author_name, articles=1):
+    def __init__(self, author_name):
         self.author_name = author_name
-        self.articles = articles
         self.left = None
         self.right = None
 
@@ -446,9 +444,6 @@ class BinarySearchTree:
                 node.right = TreeNode(author_name)
             else:
                 self._insert(node.right, author_name)
-        else:
-            # If the author already exists, increment the articles count
-            node.articles += 1
 
     def delete(self, author_name):
         self.root = self._delete(self.root, author_name)
@@ -469,7 +464,6 @@ class BinarySearchTree:
 
             temp_val = self._min_value_node(node.right)
             node.author_name = temp_val.author_name
-            node.articles = temp_val.articles
             node.right = self._delete(node.right, temp_val.author_name)
 
         return node
@@ -483,22 +477,33 @@ class BinarySearchTree:
     def inorder_traversal(self, node, result):
         if node:
             self.inorder_traversal(node.left, result)
-            result.append((node.author_name, node.articles))
+            result.append(node.author_name)
             self.inorder_traversal(node.right, result)
         return result
 
+# Kuyruktaki yazarları döndüren fonksiyon
+def get_authors_queue(data):
+    authors_queue = []
+    for _, row in data.iterrows():
+        main_author = row['author_name'].strip().lower()
+        authors_queue.append(main_author)
+    return list(set(authors_queue))  # Tekrar eden yazarları çıkartalım
+
+# BST'yi kuyruktan oluşturan fonksiyon
 def create_bst_from_queue(queue):
     bst = BinarySearchTree()
     for author in queue:
         bst.insert(author)
     return bst
 
+# BST'yi görselleştiren fonksiyon
 def visualize_bst(bst):
     graph = Network(height="800px", width="100%", bgcolor="#222222", font_color="white")
 
     def add_nodes(node):
         if node:
-            graph.add_node(node.author_name, label=node.author_name)
+            color = "red"
+            graph.add_node(node.author_name, label=node.author_name, color=color)
             add_nodes(node.left)
             add_nodes(node.right)
 
@@ -527,7 +532,6 @@ def visualize_bst(bst):
     # Open the HTML file in the default web browser
     webbrowser.open_new_tab(output_file)
 
-
 @app.route('/create_bst', methods=['POST'])
 def create_bst_route():
     queue = session.get('queue', [])
@@ -547,11 +551,12 @@ def create_bst_route():
     visualize_bst(bst)
 
     # Generate the output string
-    output = "BST created and visualized. \nAuthor details (Name: Number of Articles):\n"
-    for author_name, articles in author_details:
-        output += f"{author_name}: {articles}\n"
+    output = "BST created and visualized. \nAuthor details (Name):\n"
+    for author_name in author_details:
+        output += f"{author_name}\n"
 
     return output
+
 
 @app.route('/longest_path', methods=['POST'])
 def get_longest_path():
@@ -689,7 +694,7 @@ def upload_file():
                             .catch(error => updateOutput('Bir hata oluştu: ' + error));
                         }}
                     }}
-                    
+
                     function calculateShortestPathsFromAuthor() {{
                         const authorId = prompt("Lütfen yazar ID'sini girin (örneğin: 'John Doe-1234'):");
                         if (!authorId) {{
@@ -732,7 +737,7 @@ def upload_file():
                                 .catch(error => updateOutput('Bir hata oluştu: ' + error));
                         }}
                     }}
-                    
+
                     function createBSTFromQueue() {{
                         const authorId = prompt("Lütfen silinecek yazar ID'sini girin:");
                         const formData = new FormData();
