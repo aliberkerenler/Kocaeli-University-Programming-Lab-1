@@ -419,8 +419,9 @@ def find_longest_path(start_node, visited=None, current_path=None):
     return longest_path
 
 class TreeNode:
-    def __init__(self, author_name):
+    def __init__(self, author_name, articles=1):
         self.author_name = author_name
+        self.articles = articles
         self.left = None
         self.right = None
 
@@ -440,12 +441,14 @@ class BinarySearchTree:
                 node.left = TreeNode(author_name)
             else:
                 self._insert(node.left, author_name)
+        elif author_name > node.author_name:
+            if node.right is None:
+                node.right = TreeNode(author_name)
+            else:
+                self._insert(node.right, author_name)
         else:
-            if author_name >= node.author_name:
-                if node.right is None:
-                    node.right = TreeNode(author_name)
-                else:
-                    self._insert(node.right, author_name)
+            # If the author already exists, increment the articles count
+            node.articles += 1
 
     def delete(self, author_name):
         self.root = self._delete(self.root, author_name)
@@ -466,6 +469,7 @@ class BinarySearchTree:
 
             temp_val = self._min_value_node(node.right)
             node.author_name = temp_val.author_name
+            node.articles = temp_val.articles
             node.right = self._delete(node.right, temp_val.author_name)
 
         return node
@@ -479,14 +483,9 @@ class BinarySearchTree:
     def inorder_traversal(self, node, result):
         if node:
             self.inorder_traversal(node.left, result)
-            result.append(node.author_name)
+            result.append((node.author_name, node.articles))
             self.inorder_traversal(node.right, result)
         return result
-
-    def count_nodes(self, node):
-        if node is None:
-            return 0
-        return 1 + self.count_nodes(node.left) + self.count_nodes(node.right)
 
 def create_bst_from_queue(queue):
     bst = BinarySearchTree()
@@ -541,13 +540,18 @@ def create_bst_route():
     if author_id_to_delete:
         bst.delete(author_id_to_delete)
 
-    # Count the number of nodes in the BST
-    node_count = bst.count_nodes(bst.root)
+    # Collect author details
+    author_details = bst.inorder_traversal(bst.root, [])
 
     # Visualize the BST
     visualize_bst(bst)
 
-    return f"BST created and visualized. Number of articles in the tree: {node_count}"
+    # Generate the output string
+    output = "BST created and visualized. \nAuthor details (Name: Number of Articles):\n"
+    for author_name, articles in author_details:
+        output += f"{author_name}: {articles}\n"
+
+    return output
 
 @app.route('/longest_path', methods=['POST'])
 def get_longest_path():
