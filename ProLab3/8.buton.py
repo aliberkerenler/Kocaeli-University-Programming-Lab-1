@@ -592,7 +592,7 @@ def get_longest_path():
 
 
 @app.route('/', methods=['GET', 'POST'])
-def upload_file():
+def wish_me_luck():
     if request.method == 'POST':
         if 'file' not in request.files:
             return 'No file part'
