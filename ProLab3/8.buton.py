@@ -274,35 +274,11 @@ def find_shortest_path_between_authors(start_author, end_author, nodes, edges):
     return []
 
 
-@app.route('/shortest_paths_from_author', methods=['POST'])
-def shortest_paths_from_author():
-    author_id = request.form.get('author_id')
-    if not author_id or author_id not in nodes:
-        return f"Geçersiz veya bulunamayan yazar ID: {author_id}"
-
-    distances, previous_nodes = calculate_shortest_paths_from_author(author_id, nodes, edges)
-
-    result_html = f"<h2>{nodes[author_id]['label']} için en kısa yollar:</h2><table border='1'><tr><th>Yazar</th><th>Mesafe</th><th>Yol</th></tr>"
-    for node_id, distance in distances.items():
-        if distance < float('inf'):
-            path = []
-            current = node_id
-            while current is not None:
-                path.append(nodes[current]['label'])
-                current = previous_nodes[current]
-            path = ' ➔ '.join(path[::-1])
-            result_html += f"<tr><td>{nodes[node_id]['label']}</td><td>{distance}</td><td>{path}</td></tr>"
-    result_html += "</table>"
-
-    return result_html
-
-
 def calculate_shortest_paths_from_author(author_id, nodes, edges):
-    # A yazarı ve işbirlikçileri arasında kısa yolları hesaplamak için Dijkstra Algoritması'nı manuel olarak uyguluyoruz.
     distances = {node_id: float('inf') for node_id in nodes}
-    distances[author_id] = 0
-    unvisited_nodes = list(nodes.keys())
     previous_nodes = {node_id: None for node_id in nodes}
+    distances[author_id] = 0
+    unvisited_nodes = set(nodes.keys())
 
     while unvisited_nodes:
         # En kısa mesafeye sahip düğümü bul
@@ -313,15 +289,50 @@ def calculate_shortest_paths_from_author(author_id, nodes, edges):
             break
 
         # Komşu düğümler üzerinden güncellemeler yap
-        for (source, target), weight in edges.items():
-            if source == current_node or target == current_node:
-                neighbor = target if source == current_node else source
-                alternative_route = distances[current_node] + weight
-                if alternative_route < distances[neighbor]:
-                    distances[neighbor] = alternative_route
+        for neighbor in get_neighbors(current_node, edges):
+            if neighbor in unvisited_nodes:
+                # Kenar yönünü kontrol et
+                edge_key = (current_node, neighbor) if (current_node, neighbor) in edges else (neighbor, current_node)
+                distance = distances[current_node] + edges[edge_key]
+                if distance < distances[neighbor]:
+                    distances[neighbor] = distance
                     previous_nodes[neighbor] = current_node
 
     return distances, previous_nodes
+
+def get_neighbors(node, edges):
+    neighbors = []
+    for (source, target) in edges:
+        if source == node:
+            neighbors.append(target)
+        elif target == node:
+            neighbors.append(source)
+    return neighbors
+
+@app.route('/shortest_paths_from_author', methods=['POST'])
+def shortest_paths_from_author():
+    author_input = request.form.get('author_id')
+    author_id = find_node_id(author_input)
+
+    if not author_id:
+        return jsonify({'error': f"Yazar '{author_input}' bulunamadı."})
+
+    distances, previous_nodes = calculate_shortest_paths_from_author(author_id, nodes, edges)
+
+    # Adım adım tabloyu güncelleme
+    result_text = f"{nodes[author_id]['label']} için en kısa yollar:\n"
+    for node_id, distance in distances.items():
+        if distance < float('inf'):
+            path = []
+            current = node_id
+            while current is not None:
+                path.append(nodes[current]['label'])
+                current = previous_nodes[current]
+            path = ' ➔ '.join(path[::-1])
+            result_text += f"Yazar: {nodes[node_id]['label']}, Mesafe: {distance}, Yol: {path}\n"
+
+    return result_text
+
 
 def find_node_id(author_input):
     author_input = author_input.strip().lower()
@@ -702,26 +713,23 @@ def upload_file():
         }}
 
                     function calculateShortestPathsFromAuthor() {{
-                        const authorId = prompt("Lütfen en kısa yollarını hesaplamak istediğiniz yazar ID'sini girin:");
-                        if (!authorId) {{
-                            updateOutput("Herhangi bir ID girilmedi!");
-                            return;
-                        }}
-                        fetch('/shortest_paths_from_author', {{
-                            method: 'POST',
-                            headers: {{
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            }},
-                            body: `author_id=${{authorId}}`,
-                        }})
-                        .then(response => response.text())
-                        .then(data => {{
-                            updateOutput(data);
-                        }})
-                        .catch(error => {{
-                            updateOutput("Bir hata oluştu: " + error.message);
-                        }});
-                    }}
+            const authorInput = prompt("Lütfen en kısa yollarını hesaplamak istediğiniz yazar ID'sini veya ismini girin:");
+            if (!authorInput) {{
+                updateOutput("Herhangi bir ID girilmedi!");
+                return;
+            }}
+            const formData = new FormData();
+            formData.append('author_id', authorInput);
+            fetch('/shortest_paths_from_author', {{
+                method: 'POST',
+                body: formData
+            }})
+            .then(response => response.text())
+            .then(data => {{
+                updateOutput(data);
+            }})
+            .catch(error => updateOutput("Bir hata oluştu: " + error.message));
+        }}
 
                      function calculateShortestPath() {{
                         const startAuthor = prompt("Lütfen başlangıç yazarının ID'sini veya adını girin:");
