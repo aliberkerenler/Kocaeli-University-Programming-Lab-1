@@ -40,19 +40,25 @@ def calculate_author_total_papers(data):
             author_total_papers[author] = author_total_papers.get(author, 0) + 1
     return author_total_papers
 
+
 def calculate_node_weights(data, author_input):
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+
     # Tüm yazarların toplam makale sayısını hesapla
     author_total_papers = calculate_author_total_papers(data)
+    logging.debug(f"Author total papers: {author_total_papers}")
 
     # A yazarı ile işbirliği yapan diğer yazarları belirle
     coauthors = set()
     for _, row in data.iterrows():
-        if author_input in row['author_name'].strip().lower() or author_input in row['orcid'].strip().lower():
-            try:
+        try:
+            if author_input in row['author_name'].strip().lower() or author_input in row['orcid'].strip().lower():
                 row_coauthors = ast.literal_eval(row['coauthors'])
                 coauthors.update([coauthor.strip() for coauthor in row_coauthors])
-            except (ValueError, SyntaxError):
-                continue
+        except (ValueError, SyntaxError) as e:
+            logging.error(f"Error parsing coauthors for {author_input}: {e}")
+            continue
 
     # A yazarı ile işbirliği yapan yazarların makale sayısını al
     node_weights = []
@@ -63,14 +69,20 @@ def calculate_node_weights(data, author_input):
     # Düğüm ağırlıklarına göre sıralama
     node_weights.sort(key=lambda x: x[1], reverse=True)  # Ağırlığa göre azalan sırada sıralanır
 
+    logging.debug(f"Node weights: {node_weights}")
     return node_weights
 
 
 @app.route('/calculate_node_weights/<author_input>', methods=['GET'])
 def calculate_node_weights_route(author_input):
-    weights = calculate_node_weights(data, author_input)
-    session['queue'] = weights  # Kuyruğu session'da sakla
-    return jsonify({'weights': [{'name': author, 'articles': count} for author, count in weights]})
+    try:
+        weights = calculate_node_weights(data, author_input)
+        session['queue'] = weights  # Kuyruğu session'da sakla
+        return jsonify({'weights': [{'name': author, 'articles': count} for author, count in weights]})
+    except Exception as e:
+        import logging
+        logging.error(f"Error in calculate_node_weights_route for {author_input}: {e}")
+        return jsonify({'error': str(e)})
 
 
 @app.route('/dequeue_node', methods=['POST'])
