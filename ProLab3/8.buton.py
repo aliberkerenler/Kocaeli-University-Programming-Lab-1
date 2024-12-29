@@ -117,7 +117,6 @@ def create_manual_graph(data):
         orcid = row['orcid'].strip()
         paper_title = row['paper_title']
         doi = row['doi']
-        position = row['author_position']
 
         try:
             coauthors = ast.literal_eval(row['coauthors'])
@@ -248,7 +247,7 @@ def visualize_graph_with_output(nodes, edges, author_total_papers, highlight_pat
 
 
 # En kısa yolu BFS uygulanarak bulan fonksiyon
-def find_shortest_path_between_authors(start_author, end_author, nodes, edges):
+def find_shortest_path_between_authors(start_author, end_author, edges):
     # BFS için bir kuyruk ve ziyaret edilen düğümler listesi
     queue = [(start_author, [start_author])]
     visited = set()
@@ -352,7 +351,7 @@ def shortest_path_route(start_author, end_author):
         return f"Hata: '{start_author}' veya '{end_author}' girdisiyle eşleşen bir yazar bulunamadı."
 
     # En kısa yol algoritmasını çağır
-    queue = find_shortest_path_between_authors(start_node, end_node, nodes, edges)
+    queue = find_shortest_path_between_authors(start_node, end_node, edges)
 
     if not queue:
         return f"{start_author} ile {end_author} arasında bir bağlantı bulunamadı."
@@ -541,7 +540,7 @@ def create_bst_route():
     queue = session.get('queue', [])
 
     if not queue:
-        return "Queue is empty or not initialized."
+        return "Kuyruk oluşturulamadı!"
 
     bst = create_bst_from_queue(queue)
     author_id_to_delete = request.form.get('author_id')
@@ -552,7 +551,7 @@ def create_bst_route():
 
     visualize_bst(bst)
 
-    output = "BST created and visualized. \nAuthor details (Name):\n"
+    output = "BST oluşturuldu. \nYazar İsimleri:\n"
     for author_name in author_details:
         output += f"{author_name}\n"
 
