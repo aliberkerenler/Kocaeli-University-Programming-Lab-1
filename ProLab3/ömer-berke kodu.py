@@ -1,5 +1,4 @@
 import webbrowser
-
 import pandas as pd
 from pyvis.network import Network
 import ast  # String'i listeye dönüştürmek için kullanılacak
@@ -7,13 +6,12 @@ import os
 from flask import Flask, request, render_template_string, jsonify, session
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Set this to a unique and secret key
+app.secret_key = 'your_secret_key'
 
 # Global değişkenler
+queue = []
 nodes = {}
 edges = {}
-queue = []
-
 
 # Excel'den veri okuma fonksiyonu
 def read_excel_data(file_path):
@@ -24,10 +22,7 @@ def read_excel_data(file_path):
             raise ValueError(f"Excel dosyasında '{col}' sütunu eksik!")
     return df[required_columns]
 
-
-# Excel dosyasını burada okuyoruz, örneğin 'data.xlsx' dosyasını kullanarak
 data = read_excel_data('dataset.xlsx')
-
 
 # Tüm yazarların toplam makale sayısını hesaplayan fonksiyon
 def calculate_author_total_papers(data):
@@ -45,8 +40,7 @@ def calculate_author_total_papers(data):
             author_total_papers[author] = author_total_papers.get(author, 0) + 1
     return author_total_papers
 
-
-# A yazarı ve işbirliği yaptığı yazarların düğüm ağırlıklarına göre sıralanması
+# A yazarı ve işbirliği yaptığı yazarların düğüm ağırlıklarına göre sıralayan fonksiyon
 def calculate_node_weights(data, author_id):
     # Tüm yazarların toplam makale sayısını hesapla
     author_total_papers = calculate_author_total_papers(data)
@@ -79,7 +73,7 @@ def calculate_node_weights_route(author_id):
     return jsonify({'weights': [{'name': author, 'articles': count} for author, count in weights]})
 
 
-# En çok işbirliği yapan yazarı belirleme
+# En çok işbirliği yapan yazarı belirleyen fonksiyon
 def find_most_collaborative_author(edges):
     collaboration_count = {}
     for (source, target), weight in edges.items():
@@ -153,12 +147,6 @@ def create_manual_graph(data):
 
     return nodes, edges, main_authors
 
-
-# Fonksiyonu çağırarak çıktıları kontrol edelim
-data = read_excel_data('dataset.xlsx')
-nodes, edges, main_authors = create_manual_graph(data)
-
-
 def visualize_graph_with_output(nodes, edges, author_total_papers, highlight_path=None):
     graph = Network(height="800px", width="100%", bgcolor="#222222", font_color="white")
     graph.set_options(""" 
@@ -195,7 +183,6 @@ def visualize_graph_with_output(nodes, edges, author_total_papers, highlight_pat
 
     avg_paper_count = sum(author_total_papers.values()) / len(author_total_papers)
     for node_id, node_data in nodes.items():
-        author_name = node_data['label']
         paper_count = len(node_data["papers"])  # Düğümdeki makale sayısını kullan
         paper_info = node_data.get("papers", {})
         paper_details = "<br>".join(
@@ -210,7 +197,7 @@ def visualize_graph_with_output(nodes, edges, author_total_papers, highlight_pat
         else:
             size = 60
             color = "gray"
-        # Highlight path nodes in red
+
         if highlight_path and node_id in highlight_path:
             color = "red"
             size = 100
@@ -240,10 +227,10 @@ def visualize_graph_with_output(nodes, edges, author_total_papers, highlight_pat
     return graph
 
 
-# En kısa yol bulma algoritması (BFS uygulanarak)
+# En kısa yolu BFS uygulanarak bulan fonksiyon
 def find_shortest_path_between_authors(start_author, end_author, nodes, edges):
     # BFS için bir kuyruk ve ziyaret edilen düğümler listesi
-    queue = [(start_author, [start_author])]  # (current_node, path_so_far)
+    queue = [(start_author, [start_author])]
     visited = set()
 
     while queue:
@@ -316,6 +303,10 @@ def calculate_shortest_paths_from_author(author_id, nodes, edges):
 
     return distances, previous_nodes
 
+def find_node_id(author_name):
+    author_name = author_name.strip().lower()
+    return next((node_id for node_id, node_data in nodes.items()
+                 if author_name in node_id.lower() or author_name in node_data['label'].lower()), None)
 
 @app.route('/shortest_path/<start_author>/<end_author>', methods=['GET'])
 def shortest_path_route(start_author, end_author):
@@ -323,10 +314,8 @@ def shortest_path_route(start_author, end_author):
     end_author = end_author.strip().lower()
 
     # Kullanıcı girdisine göre düğüm ID'lerini bul
-    start_node = next((node_id for node_id, node_data in nodes.items()
-                       if start_author in node_id.lower() or start_author in node_data['label'].lower()), None)
-    end_node = next((node_id for node_id, node_data in nodes.items()
-                     if end_author in node_id.lower() or end_author in node_data['label'].lower()), None)
+    start_node = find_node_id(start_author)
+    end_node = find_node_id(end_author)
 
     if not start_node or not end_node:
         return f"Hata: '{start_author}' veya '{end_author}' girdisiyle eşleşen bir yazar bulunamadı."
@@ -357,37 +346,25 @@ def shortest_path_route(start_author, end_author):
 # Kullanıcıdan gelen yazar ID'sine göre işbirliği sayısını hesaplama route'u
 @app.route('/calculate_collaborators/<author_input>', methods=['GET'])
 def calculate_collaborators(author_input):
-    author_input = author_input.strip().lower()  # Kullanıcı girdisini temizle
-    matching_node_ids = []  # Kullanıcının girdisine uygun düğüm ID'lerini toplayacağımız liste
+    author_input = author_input.strip().lower()
 
-    # Kullanıcının girdisiyle eşleşen node ID'lerini bul
-    for node_id, node_data in nodes.items():
-        if author_input in node_id.lower() or author_input in node_data['label'].lower():
-            matching_node_ids.append(node_id)
+    node_id = find_node_id(author_input)
 
-    # Eğer eşleşen düğüm bulunamazsa hata mesajı döndür
-    if not matching_node_ids:
+    if not node_id:
         return f"Hata: '{author_input}' girdisiyle eşleşen bir yazar bulunamadı."
 
-    # İşbirliği yapan yazarları toplamak için bir set kullanıyoruz
     collaborators = set()
 
-    # edges üzerinden matching_node_ids ile işbirliği yapılan yazarları bul
     for (source, target) in edges:
-        if any(node_id.lower() == source.lower() or node_id.lower() == target.lower() for node_id in matching_node_ids):
+        if source == node_id or target == node_id:
             collaborators.add(source)
             collaborators.add(target)
 
-    # Seçilen yazarı işbirliği listesinden çıkar
-    for node_id in matching_node_ids:
-        collaborators.discard(node_id)
+    collaborators.discard(node_id)
 
-    # İşbirliği yapan toplam yazar sayısını hesapla
     total_collaborators = len(collaborators)
 
-    # Sonuç mesajını döndür
     return f"'{author_input}' yazarının işbirliği yaptığı toplam yazar sayısı: {total_collaborators}"
-
 
 def find_longest_path(start_node, visited=None, current_path=None):
     if visited is None:
@@ -516,20 +493,16 @@ def visualize_bst(bst):
                 graph.add_edge(node.author_name, node.right.author_name, color="white")
                 add_edges(node.right)
 
-    # Add all nodes first
     add_nodes(bst.root)
-    # Then add all edges
+
     add_edges(bst.root)
 
-    # Manually create the HTML content
     html_content = graph.generate_html()
 
-    # Save the HTML to a file
     output_file = "bst.html"
     with open(output_file, 'w') as f:
         f.write(html_content)
 
-    # Open the HTML file in the default web browser
     webbrowser.open_new_tab(output_file)
 
 @app.route('/create_bst', methods=['POST'])
@@ -544,13 +517,10 @@ def create_bst_route():
     if author_id_to_delete:
         bst.delete(author_id_to_delete)
 
-    # Collect author details
     author_details = bst.inorder_traversal(bst.root, [])
 
-    # Visualize the BST
     visualize_bst(bst)
 
-    # Generate the output string
     output = "BST created and visualized. \nAuthor details (Name):\n"
     for author_name in author_details:
         output += f"{author_name}\n"
@@ -591,7 +561,6 @@ def get_longest_path():
     return f"Yazar {nodes[start_node]['label']} için en uzun yol: {path_labels} (Uzunluk: {path_length})"
 
 
-# Flask route for file upload
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
@@ -680,25 +649,23 @@ def upload_file():
 
 
                     function calculateNodeWeights() {{
-                        const authorId = prompt("Lütfen A yazarının ID'sini girin:");
-                        if (authorId) {{
-                            fetch(`/calculate_node_weights/${{authorId}}`)
+                        const authorId = prompt("Lütfen A yazarının ID'sini giriniz:");
+                        fetch(`/calculate_node_weights/${{authorId}}`)
                             .then(response => response.json())
                             .then(data => {{
-                                let content = 'Düğüm ağırlıkları hesaplandı:<br>';
+                                let content = 'Düğüm ağırlıkları hesaplandı.<br>';
                                 data.weights.forEach(weight => {{
                                     content += `${{weight.name}}: ${{weight.articles}} makale<br>`;
                                 }});
                                 updateOutput(content);
                             }})
                             .catch(error => updateOutput('Bir hata oluştu: ' + error));
-                        }}
                     }}
 
                     function calculateShortestPathsFromAuthor() {{
-                        const authorId = prompt("Lütfen yazar ID'sini girin (örneğin: 'John Doe-1234'):");
+                        const authorId = prompt("Lütfen en kısa yollarını hesaplamak istediğiniz yazar ID'sini girin:");
                         if (!authorId) {{
-                            updateOutput("Yazar ID'si girilmedi.");
+                            updateOutput("Herhangi bir ID girilmedi!");
                             return;
                         }}
                         fetch('/shortest_paths_from_author', {{
@@ -713,33 +680,41 @@ def upload_file():
                             updateOutput(data);
                         }})
                         .catch(error => {{
-                            updateOutput("Hata: " + error.message);
+                            updateOutput("Bir hata oluştu: " + error.message);
                         }});
                     }}
 
                      function calculateShortestPath() {{
                         const startAuthor = prompt("Lütfen başlangıç yazarının ID'sini veya adını girin:");
                         const endAuthor = prompt("Lütfen bitiş yazarının ID'sini veya adını girin:");
-                           if (startAuthor && endAuthor) {{
-                               fetch(`/shortest_path/${{startAuthor}}/${{endAuthor}}`)
-                               .then(response => response.text())
-                           .then(data => updateOutput(data))
-                            .catch(error => updateOutput('Bir hata oluştu: ' + error));
+                        if(!(startAuthor && endAuthor)) {{
+                            updateOutput("Herhangi bir ID girilmedi!");
+                            return;
                         }}
+                        fetch(`/shortest_path/${{startAuthor}}/${{endAuthor}}`)
+                            .then(response => response.text())
+                            .then(data => updateOutput(data))
+                            .catch(error => updateOutput('Bir hata oluştu: ' + error));
                    }}
 
                     function calculateCollaborators() {{
-                        const authorId = prompt("Lütfen yazar ID'sini girin (örneğin: 'John Doe-1234'):");
-                        if (authorId) {{
-                            fetch(`/calculate_collaborators/${{authorId}}`)
-                                .then(response => response.text())
-                                .then(data => updateOutput(data))
-                                .catch(error => updateOutput('Bir hata oluştu: ' + error));
+                        const authorId = prompt("Lütfen işbirliği sayısını hesaplamak istediğiniz yazarın ID'sini girin:");
+                        if (!authorId) {{
+                            updateOutput("Herhangi bir ID girilmedi!");
+                            return;
                         }}
+                        fetch(`/calculate_collaborators/${{authorId}}`)
+                            .then(response => response.text())
+                            .then(data => updateOutput(data))
+                            .catch(error => updateOutput('Bir hata oluştu: ' + error));
                     }}
 
                     function createBSTFromQueue() {{
-                        const authorId = prompt("Lütfen silinecek yazar ID'sini girin:");
+                        const authorId = prompt("Lütfen silmek isteğiniz yazarın ID'sini girin:");
+                        if (!authorId) {{
+                            updateOutput("Herhangi bir ID girilmedi!");
+                            return;
+                        }}
                         const formData = new FormData();
                         formData.append('author_id', authorId);
                         fetch('/create_bst', {{
@@ -751,10 +726,10 @@ def upload_file():
                         .catch(error => updateOutput('Bir hata oluştu: ' + error));
                     }}
 
-                    function findLongestPath() {{
-                        const authorId = prompt("Lütfen bir yazar ID'si girin:");
+                    function LongestPath() {{
+                        const authorId = prompt("En uzun yolunu bulmak isteğiniz yazarın ID'si giriniz:");
                         if (!authorId) {{
-                            updateOutput("Yazar ID'si girilmedi.");
+                            updateOutput("Herhangi bir ID girilmedi!");
                             return;
                         }}
                         fetch('/longest_path', {{
@@ -769,24 +744,24 @@ def upload_file():
                            updateOutput(data);
                         }})
                         .catch(error => {{
-                            updateOutput("Hata: " + error.message);
+                            updateOutput("Bir hata oluştu: " + error.message);
                         }});
                     }}
                 </script>
             </head>
             <body>
                 <div id="sidebar">
-                    <h3>İsterler</h3>
+                    <h3>İster Menüsü</h3>
                     <div id="buttons">
                         <div class="button" onclick="calculateShortestPath()">1. A ile B yazarı arasındaki en kısa yol</div>
                         <div class="button" onclick="calculateNodeWeights()">2. A yazarı için düğüm ağırlıkları</div>
-                        <div class="button" onclick="createBSTFromQueue()">3. Kuyruktan BST oluşturma</div>
-                        <div class="button" onclick="calculateShortestPathsFromAuthor()">4. Kısa yolları hesaplama</div>
-                        <div class="button" onclick="calculateCollaborators()">5. İşbirliği yapan yazar sayısı</div>
+                        <div class="button" onclick="createBSTFromQueue()">3. Kuyruktan BST oluştur</div>
+                        <div class="button" onclick="calculateShortestPathsFromAuthor()">4. Yazar için kısa yolları hesapla</div>
+                        <div class="button" onclick="calculateCollaborators()">5. İşbirliği yapılan yazar sayısı</div>
                         <div class="button" onclick="showMostCollaborativeAuthor()">6. En çok işbirliği yapan yazar</div>
-                        <div class="button" onclick="findLongestPath()">7. En uzun yolun bulunması</div>
+                        <div class="button" onclick="LongestPath()">7. Yazar için en uzun yolun bulunması</div>
                     </div>
-                    <div id="output">Çıktılar burada görüntülenecek.</div>
+                    <div id="output">Çıktı Ekranı.</div>
                 </div>
                 <div id="graph-container">
                     {graph.generate_html()}
